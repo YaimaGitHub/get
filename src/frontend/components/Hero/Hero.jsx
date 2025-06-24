@@ -11,17 +11,16 @@ const Hero = () => {
     <section className='white-bcg'>
       <div className={`container ${styles.hero}`}>
         <article className={styles.content}>
-          <h1>Experience Electronics Redefined: Unleash Innovation</h1>
+          <h1>Experimenta la Electrónica Redefinida: Libera la Innovación</h1>
 
           <p>
-            Discover the Future of Electronics: Unleash Innovation, Immerse in
-            Unparalleled Quality. Experience our cutting-edge technology and
-            elevate your everyday with Gada Electronics. Explore the
-            extraordinary today.
+            Descubre el Futuro de la Electrónica: Libera la Innovación, Sumérgete en 
+            Calidad Sin Igual. Experimenta nuestra tecnología de vanguardia y 
+            eleva tu día a día con Gada Electronics. Explora lo extraordinario hoy.
           </p>
 
           <Link to='/products' className={`btn ${styles.btnHero}`}>
-            Shop now
+            Comprar ahora
           </Link>
         </article>
 

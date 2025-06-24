@@ -47,7 +47,7 @@ const Filters = ({
 
   const handleClearFilter = () => {
     clearFilters();
-    toastHandler(ToastType.Success, 'Cleared Filters Successfully');
+    toastHandler(ToastType.Success, 'Filtros limpiados exitosamente');
   };
 
   return (
@@ -64,18 +64,18 @@ const Filters = ({
       )}
 
       <header>
-        <p>Filters</p>
+        <p>Filtros</p>
         <button className='btn btn-danger' onClick={handleClearFilter}>
-          Clear Filters
+          Limpiar Filtros
         </button>
       </header>
 
       <fieldset>
-        <legend>Price Range</legend>
+        <legend>Rango de Precio</legend>
 
         <Slider
           name={FILTER_INPUT_TYPE.PRICE}
-          getAriaLabel={() => 'Minimum distance'}
+          getAriaLabel={() => 'Distancia mínima'}
           valueLabelDisplay='auto'
           min={minPriceFromContext}
           max={maxPriceFromContext}
@@ -98,7 +98,7 @@ const Filters = ({
       </fieldset>
 
       <fieldset>
-        <legend>Category</legend>
+        <legend>Categoría</legend>
 
         {categoriesList.map((singleCategory, index) => (
           <div key={index}>
@@ -117,14 +117,14 @@ const Filters = ({
       </fieldset>
 
       <fieldset>
-        <legend>Company</legend>
+        <legend>Marca</legend>
 
         <select
           name={FILTER_INPUT_TYPE.COMPANY}
           onChange={updateFilters}
           value={companyFromContext}
         >
-          <option value='all'>All</option>
+          <option value='all'>Todas</option>
           {companiesList.map((company, index) => (
             <option key={giveUniqueLabelFOR(company, index)} value={company}>
               {company}
@@ -134,7 +134,7 @@ const Filters = ({
       </fieldset>
 
       <fieldset className={styles.ratingFieldset}>
-        <legend>Rating</legend>
+        <legend>Calificación</legend>
 
         {RATINGS.map((singleRating, index) => (
           <div key={singleRating}>
@@ -143,18 +143,18 @@ const Filters = ({
               name={FILTER_INPUT_TYPE.RATING}
               data-rating={singleRating}
               onChange={updateFilters}
-              id={giveUniqueLabelFOR(`${singleRating} stars`, index)}
+              id={giveUniqueLabelFOR(`${singleRating} estrellas`, index)}
               checked={singleRating === ratingFromContext}
             />{' '}
-            <label htmlFor={giveUniqueLabelFOR(`${singleRating} stars`, index)}>
-              {singleRating} <FaStar /> & above
+            <label htmlFor={giveUniqueLabelFOR(`${singleRating} estrellas`, index)}>
+              {singleRating} <FaStar /> y más
             </label>
           </div>
         ))}
       </fieldset>
 
       <fieldset>
-        <legend>Sort By</legend>
+        <legend>Ordenar Por</legend>
 
         {Object.values(SORT_TYPE).map((singleSortValue, index) => (
           <div key={singleSortValue}>

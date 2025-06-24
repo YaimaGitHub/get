@@ -22,7 +22,7 @@ const Suggestions = ({
       <section className={styles.suggestions}>
         <div className='horizontal-center'>
           <p className={`bold ${styles.textPlease}`}>
-            Enter the name of the product.
+            Ingresa el nombre del producto.
           </p>
         </div>
       </section>
@@ -33,7 +33,7 @@ const Suggestions = ({
     return (
       <section className={styles.suggestions}>
         <div className='horizontal-center'>
-          <p className='error-text'>No products found ☹️</p>
+          <p className='error-text'>No se encontraron productos ☹️</p>
         </div>
       </section>
     );

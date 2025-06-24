@@ -38,7 +38,7 @@ export const toastHandler = (type, message, toastId = uuid()) => {
 };
 
 export const LOGIN_TOAST = () => {
-  toastHandler(ToastType.Warn, 'Please login to continue', CUSTOM_TOASTID);
+  toastHandler(ToastType.Warn, 'Por favor inicia sesión para continuar', CUSTOM_TOASTID);
 };
 
 export const setIntoLocalStorage = (name, dataObj) => {
@@ -77,7 +77,7 @@ export const givePaginatedList = (list) => {
 };
 
 export const formatPrice = (price) =>
-  price.toLocaleString('en-IN', {
+  price.toLocaleString('es-ES', {
     maximumFractionDigits: 2,
   });
 

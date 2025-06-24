@@ -59,11 +59,11 @@ const Address = () => {
               onClick={deleteAllAddressDispatch}
               className='btn btn-danger btn-center'
             >
-              Clear All Address
+              Limpiar Todas las Direcciones
             </button>
           </>
         ) : (
-          <p>No address to display</p>
+          <p>No hay direcciones para mostrar</p>
         )}
       </div>
     </section>

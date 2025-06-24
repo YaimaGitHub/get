@@ -7,7 +7,7 @@ const AddAddressBtn = ({ openForm }) => {
     <button onClick={openForm} className={styles.addAddressBtn}>
       <AiFillPlusSquare />
 
-      <span>Add new address</span>
+      <span>Agregar nueva dirección</span>
     </button>
   );
 };

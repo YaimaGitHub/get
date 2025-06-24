@@ -24,11 +24,11 @@ const LinksContainer = () => {
   return (
     <div className={styles.linksContainer}>
       <NavLink className={styles.exploreLink} to='/products'>
-        Explore
+        Explorar
       </NavLink>
 
       <NavLink className={navStyle} to='/profile'>
-        {user ? <FaRegUserCircle /> : <div className={styles.login}>Login</div>}
+        {user ? <FaRegUserCircle /> : <div className={styles.login}>Iniciar Sesión</div>}
       </NavLink>
 
       <NavLink className={navStyle} to='/wishlist'>

@@ -15,16 +15,16 @@ const CartPage = () => {
 
   const handleClearCart = () => {
     clearCartDispatch();
-    toastHandler(ToastType.Success, 'Cleared Cart Successfully');
+    toastHandler(ToastType.Success, 'Carrito limpiado exitosamente');
   };
 
   if (cartFromContext.length < 1) {
-    return <EmptyList listName='cart' />;
+    return <EmptyList listName='carrito' />;
   }
 
   return (
     <main className={`full-page ${styles.cartListPage}`}>
-      <Title>Cart ({cartFromContext.length})</Title>
+      <Title>Carrito ({cartFromContext.length})</Title>
 
       <div className={`container ${styles.cartCenter}`}>
         <section className={styles.cartListContainer}>
@@ -39,13 +39,13 @@ const CartPage = () => {
             className='btn btn-danger btn-padding-desktop btn-center mt-2'
             onClick={handleClearCart}
           >
-            Clear Cart
+            Limpiar Carrito
           </button>
         </section>
 
         {/* this will come from cartContext */}
         <article className={styles.checkout}>
-          <h3 className='text-center'>Cart Price Details</h3>
+          <h3 className='text-center'>Detalles del Precio del Carrito</h3>
           <hr />
 
           <div className={styles.detailsContainer}>
@@ -68,12 +68,12 @@ const CartPage = () => {
 
           <hr />
           <article className={`${styles.row} ${styles.totalPrice}`}>
-            <span>Total Price ({totalCount}):</span>
+            <span>Precio Total ({totalCount}):</span>
             <Price amount={totalAmount} />
           </article>
 
           <Link to='/checkout' className='btn text-center btn-width-100'>
-            Checkout
+            Finalizar Compra
           </Link>
         </article>
       </div>

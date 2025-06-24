@@ -80,7 +80,7 @@ const SingleProductPage = () => {
   }
 
   if (isSinglePageError) {
-    return <Error errorText='Error: Product Not Found' />;
+    return <Error errorText='Error: Producto No Encontrado' />;
   }
 
   const {
@@ -168,7 +168,7 @@ const SingleProductPage = () => {
           <span className={styles.rating}>
             {stars} <AiFillStar />
           </span>
-          <p>({reviewCount} customer reviews)</p>
+          <p>({reviewCount} reseñas de clientes)</p>
         </div>
 
         <div className={styles.price}>
@@ -176,7 +176,7 @@ const SingleProductPage = () => {
           {discountPercent > 0 && (
             <>
               <Price amount={originalPrice} />
-              <span className={styles.discount}> ({discountPercent}% off)</span>
+              <span className={styles.discount}> ({discountPercent}% desc.)</span>
             </>
           )}
         </div>
@@ -184,27 +184,27 @@ const SingleProductPage = () => {
         <p className={styles.desc}>{description}</p>
 
         <div className={styles.row}>
-          <span>Availability:</span>
-          <p>{inStock ? 'In Stock' : 'Out Of Stock'}</p>
+          <span>Disponibilidad:</span>
+          <p>{inStock ? 'En Stock' : 'Agotado'}</p>
         </div>
 
         <div className={styles.row}>
-          <span>Shipping Available:</span>
-          <p>{isShippingAvailable ? 'Yes' : 'No'}</p>
+          <span>Envío Disponible:</span>
+          <p>{isShippingAvailable ? 'Sí' : 'No'}</p>
         </div>
 
         <div className={styles.row}>
-          <span>Category:</span>
+          <span>Categoría:</span>
           <p>{category}</p>
         </div>
 
         <div className={styles.row}>
-          <span>Company:</span>
+          <span>Marca:</span>
           <p>{company}</p>
         </div>
 
         <div className={styles.row}>
-          <span>Color{colors.length > 1 && 's'}:</span>
+          <span>Color{colors.length > 1 && 'es'}:</span>
 
           <div
             className={
@@ -228,7 +228,7 @@ const SingleProductPage = () => {
         </div>
 
         <div className={styles.row}>
-          <span>Available Stock:</span>
+          <span>Stock Disponible:</span>
           <p>{activeColorObj.colorQuantity}</p>
         </div>
 
@@ -242,7 +242,7 @@ const SingleProductPage = () => {
             disabled={!inStock || isCartBtnDisable}
             onClick={handleCartBtnClick}
           >
-            {isSinglePageProductInCart ? 'Go to Cart' : 'Add To Cart'}
+            {isSinglePageProductInCart ? 'Ir al Carrito' : 'Agregar al Carrito'}
           </button>
 
           <button
@@ -253,8 +253,8 @@ const SingleProductPage = () => {
             disabled={!inStock || isWishlistBtnDisable}
           >
             {isSinglePageProductInWishlist
-              ? 'Go to Wishlist'
-              : 'Add To Wishlist'}
+              ? 'Ir a Lista de Deseos'
+              : 'Agregar a Lista de Deseos'}
           </button>
         </div>
       </div>

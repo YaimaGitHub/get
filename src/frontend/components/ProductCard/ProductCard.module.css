@@ -14,7 +14,7 @@
 }
 
 .disabledProduct::before {
-  content: 'Out of Stock';
+  content: 'Agotado';
   position: absolute;
   top: 0;
   left: 0;

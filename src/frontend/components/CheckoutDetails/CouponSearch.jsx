@@ -40,9 +40,9 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
     ) {
       toastHandler(
         ToastType.Info,
-        `Shop above ₹${formatPrice(
+        `Compra por encima de ₹${formatPrice(
           couponClicked.minCartPriceRequired
-        )} to avail`
+        )} para aplicar`
       );
       return;
     }
@@ -76,7 +76,7 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
     if (!couponFound) {
       toastHandler(
         ToastType.Error,
-        `Coupon ${couponSearchInput} Not Available`
+        `Cupón ${couponSearchInput} No Disponible`
       );
 
       setIsCouponsSuggestionVisible(true);
@@ -88,7 +88,7 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
       couponFound.minCartPriceRequired <= totalAmountFromContext;
 
     if (couponFound && !isCouponAvailable) {
-      toastHandler(ToastType.Error, 'buy more to use this coupon');
+      toastHandler(ToastType.Error, 'compra más para usar este cupón');
       return;
     }
 
@@ -116,12 +116,12 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
           type='search'
           onFocus={handleSearchFocus}
           onBlur={handleSearchBlur}
-          placeholder='Enter coupon code'
+          placeholder='Ingresa código de cupón'
           onChange={(e) => setCouponSearchInput(e.target.value)}
           value={couponSearchInput}
         />
         <button disabled={!couponSearchInput} type='submit' className='btn'>
-          Apply
+          Aplicar
         </button>
       </div>
 
@@ -145,9 +145,9 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
 
                 {!isMobile && (
                   <span className={styles.tooltip}>
-                    Shop above{' '}
-                    <Price amount={singleCoupon.minCartPriceRequired} /> to
-                    avail
+                    Compra por encima de{' '}
+                    <Price amount={singleCoupon.minCartPriceRequired} /> para
+                    aplicar
                   </span>
                 )}
               </button>

@@ -35,13 +35,13 @@ const SignupPage = () => {
     if (userInputs.passwordMain !== userInputs.passwordConfirm) {
       toastHandler(
         ToastType.Error,
-        'Password and Confirm Password inputs did not match!'
+        '¡Las contraseñas no coinciden!'
       );
       return;
     }
 
     if (!userInputs.firstName.trim()) {
-      toastHandler(ToastType.Error, 'Please fill all the inputs');
+      toastHandler(ToastType.Error, 'Por favor completa todos los campos');
       return;
     }
 
@@ -61,7 +61,7 @@ const SignupPage = () => {
       updateUserAuth({ user, token });
 
       // show success toast
-      toastHandler(ToastType.Success, `Sign up successful`);
+      toastHandler(ToastType.Success, `Registro exitoso`);
 
       // if user directly comes to '/signup' from url, so state will be null, after successful registration, user should be directed to home page
       navigate(signupPageLocation?.state?.from ?? '/');
@@ -80,11 +80,11 @@ const SignupPage = () => {
 
   return (
     <LoginAndSignupLayout>
-      <Title>Signup</Title>
+      <Title>Registrarse</Title>
 
       <form onSubmit={handleCreateAccount}>
         <FormRow
-          text='First Name'
+          text='Nombre'
           type='text'
           name='firstName'
           id='firstName'
@@ -94,7 +94,7 @@ const SignupPage = () => {
           disabled={isSignupFormLoading}
         />
         <FormRow
-          text='Last Name'
+          text='Apellido'
           type='text'
           name='lastName'
           id='lastName'
@@ -105,7 +105,7 @@ const SignupPage = () => {
         />
 
         <FormRow
-          text='Email Address'
+          text='Correo Electrónico'
           type='email'
           name='email'
           id='email'
@@ -116,7 +116,7 @@ const SignupPage = () => {
         />
 
         <PasswordRow
-          text='Enter Password'
+          text='Ingresa tu Contraseña'
           name='passwordMain'
           id='passwordMain'
           placeholder='babitaji1234'
@@ -125,7 +125,7 @@ const SignupPage = () => {
           disabled={isSignupFormLoading}
         />
         <PasswordRow
-          text='Confirm Password'
+          text='Confirmar Contraseña'
           name='passwordConfirm'
           id='passwordConfirm'
           placeholder=''
@@ -138,19 +138,19 @@ const SignupPage = () => {
           {isSignupFormLoading ? (
             <span className='loader-2'></span>
           ) : (
-            'Create New Account'
+            'Crear Nueva Cuenta'
           )}
         </button>
       </form>
 
       <div>
         <span>
-          Already Registered ?{' '}
+          ¿Ya estás registrado?{' '}
           <Link
             to='/login'
             state={{ from: signupPageLocation?.state?.from ?? '/' }}
           >
-            login
+            iniciar sesión
           </Link>
         </span>
       </div>

@@ -9,11 +9,11 @@ const EmptyList = ({ listName }) => {
       <Title>{listName}</Title>
 
       <p className={`text-center ${styles.emptyText}`}>
-        Your {listName} is empty! ☹️
+        Tu {listName} está vacío! ☹️
       </p>
 
       <Link to='/products' className='btn btn-center'>
-        Explore
+        Explorar
       </Link>
     </main>
   );

@@ -45,10 +45,10 @@ const AddressCard = ({
           className='btn btn-success'
           onClick={() => updateActiveFormIdProp(addressId)}
         >
-          Edit
+          Editar
         </button>
         <button onClick={handleDelete} className='btn btn-danger'>
-          delete
+          eliminar
         </button>
       </div>
     </article>
