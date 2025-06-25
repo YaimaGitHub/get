@@ -50,7 +50,15 @@ export const getAllProductsCategoriesService = async () => {
 export const getProductsOnSearch = async ({ query }) => {
   const res = await axios.get(`/api/products/search?query=${query}`);
 
-  return res.data.products.models;
+  // Add safety check for the response structure
+  const products = res.data?.products;
+  if (products && Array.isArray(products)) {
+    return products;
+  } else if (products && products.models && Array.isArray(products.models)) {
+    return products.models;
+  } else {
+    return [];
+  }
 };
 
 export const getSingleProductService = async (productID) => {
