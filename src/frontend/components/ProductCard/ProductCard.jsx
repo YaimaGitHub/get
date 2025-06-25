@@ -31,11 +31,10 @@ const ProductCard = ({ product }) => {
     removeFromWishlistDispatch,
   } = useAllProductsContext();
 
-  // Add safety check for colors array
-  const { colors = [], stock = 0 } = product || {};
+  const { colors, stock } = product;
   const inStock = stock > 0;
 
-  const [activeColorObj, setActiveColorObj] = useState(colors[0] || { color: '#000', colorQuantity: 0 });
+  const [activeColorObj, setActiveColorObj] = useState(colors[0]);
 
   const [isBothDisable, setIsBothBtnDisable] = useState(false);
 
@@ -124,11 +123,6 @@ const ProductCard = ({ product }) => {
     setIsBothBtnDisable(false);
   };
 
-  // Add safety check for product
-  if (!product) {
-    return null;
-  }
-
   return (
     <article
       className={
@@ -180,7 +174,7 @@ const ProductCard = ({ product }) => {
               : styles.colorsContainer
           }
         >
-          {colors.map((colorObj, index) => (
+          {product.colors.map((colorObj, index) => (
             <span
               key={index}
               style={{ background: colorObj.color }}

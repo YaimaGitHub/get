@@ -29,7 +29,7 @@ const SingleProductPage = () => {
 
   const [singleProductState, setSingleProductState] = useState({
     isSinglePageLoading: true,
-    singleProductData: null,
+    singleProductData: [],
     isSinglePageError: false,
   });
 
@@ -51,13 +51,7 @@ const SingleProductPage = () => {
         singleProductData: product,
         isSinglePageError: false,
       });
-      
-      // Add safety check for colors array
-      if (product && product.colors && product.colors.length > 0) {
-        setActiveColorObj(product.colors[0]);
-      } else {
-        setActiveColorObj({ color: '#000', colorQuantity: 0 });
-      }
+      setActiveColorObj(product?.colors[0]);
     } catch (error) {
       console.error(error.response);
 
@@ -76,6 +70,8 @@ const SingleProductPage = () => {
     // eslint-disable-next-line
   }, [productId]);
 
+  // if the user is in single product page (of oneplus 10R), clicks on the suggestions Link (eg oneplus air 2020), only the productId in the url of singleProductPage changes but as the singleProductPage was already mounted, it doesnot fetch again the new product, so added productId in the dependency list
+
   const { isSinglePageLoading, singleProductData, isSinglePageError } =
     singleProductState;
 
@@ -83,7 +79,7 @@ const SingleProductPage = () => {
     return <main className='full-page'></main>;
   }
 
-  if (isSinglePageError || !singleProductData) {
+  if (isSinglePageError) {
     return <Error errorText='Error: Producto No Encontrado' />;
   }
 
@@ -93,7 +89,7 @@ const SingleProductPage = () => {
     price,
     originalPrice,
     image,
-    colors = [],
+    colors,
     company,
     description,
     category,
@@ -208,7 +204,7 @@ const SingleProductPage = () => {
         </div>
 
         <div className={styles.row}>
-          <span>Color{colors.length > 1 ? 'es' : ''}:</span>
+          <span>Color{colors.length > 1 && 'es'}:</span>
 
           <div
             className={
@@ -223,7 +219,7 @@ const SingleProductPage = () => {
                 key={index}
                 style={{ background: colorObj.color }}
               >
-                {colorObj.color === activeColorObj?.color && inStock && (
+                {colorObj.color === activeColorObj.color && inStock && (
                   <AiFillCheckCircle />
                 )}
               </div>
@@ -233,7 +229,7 @@ const SingleProductPage = () => {
 
         <div className={styles.row}>
           <span>Stock Disponible:</span>
-          <p>{activeColorObj?.colorQuantity || 0}</p>
+          <p>{activeColorObj.colorQuantity}</p>
         </div>
 
         <hr />

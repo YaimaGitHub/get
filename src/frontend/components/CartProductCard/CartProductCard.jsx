@@ -25,12 +25,10 @@ const CartProductCard = ({ singleCartItem }) => {
     wishlistFromContext
   );
 
-  const { _id, name, price, originalPrice, image, qty, colors = [] } =
+  const { _id, name, price, originalPrice, image, qty, colors } =
     singleCartItem;
 
-  // Add safety check for colors array
-  const colorObj = colors[0] || { color: '#000', colorQuantity: 0 };
-  const { color, colorQuantity } = colorObj;
+  const { color, colorQuantity } = colors[0];
 
   const discountPercent = calculateDiscountPercent(price, originalPrice);
 

@@ -65,20 +65,16 @@ const useSearchSuggestions = ({
   const fetchProductsOnSearch = async () => {
     try {
       const resProducts = await getProductsOnSearch({ query: trimmedSearch });
-      // Add safety check for array
-      const products = Array.isArray(resProducts) ? resProducts : [];
-      setSuggestionsList(products);
+      setSuggestionsList(resProducts);
       setIsSuggestionsLoading(false);
 
-      if (products.length < 1) {
+      if (resProducts.length < 1) {
         return;
       }
 
-      updateCache(products);
+      updateCache(resProducts);
     } catch (error) {
       console.log(error);
-      setSuggestionsList([]);
-      setIsSuggestionsLoading(false);
     }
   };
 
@@ -91,8 +87,7 @@ const useSearchSuggestions = ({
 
     const timer = setTimeout(() => {
       if (cacheSuggestions[trimmedSearch]) {
-        const cachedProducts = cacheSuggestions[trimmedSearch].productsCached;
-        setSuggestionsList(Array.isArray(cachedProducts) ? cachedProducts : []);
+        setSuggestionsList(cacheSuggestions[trimmedSearch].productsCached);
         // update time of that cache, if the query is re-searched and cache is present (searched again)
         setCacheSuggestions({
           ...cacheSuggestions,

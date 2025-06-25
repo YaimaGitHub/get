@@ -234,6 +234,7 @@ export const products = [
     name: 'mi 12 pro',
     price: 44999,
     originalPrice: 79999,
+    featured: true,
     image:
       'https://res.cloudinary.com/dtbd1y4en/image/upload/v1683909725/mi-12-pro_mlm5mt.jpg',
     colors: [
@@ -328,6 +329,7 @@ export const products = [
     name: 'mi note 12',
     price: 17999,
     originalPrice: 19999,
+    featured: true,
     image:
       'https://res.cloudinary.com/dtbd1y4en/image/upload/v1683910028/mi-note-12_w0gqbt.jpg',
     colors: [
@@ -869,8 +871,8 @@ export const products = [
     description:
       'For this model, screen size is 55 Inches. Product Dimensions\tis (5.1D x 122.4W x 70.6H) cm. Operating System is Android TV. Mounting Hardware includes\t1 QLED TV, 1 Wall-mounting Bracket, 1 User Manual, 1 Warranty Card, 1 Remote Control,1 AV IN Adaptor, 1AC Cord, 1 USB Type-C cable. Resolution is 4K with the refresh rate is 480 SMR.',
     category: 'tv',
-    isShippingAvailable: false,
-    stock: 0,
+    isShippingAvailable: true,
+    stock: 1,
     reviewCount: 11023,
     stars: 4.1,
   },
