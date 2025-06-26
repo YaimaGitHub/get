@@ -77,7 +77,7 @@ export const givePaginatedList = (list) => {
 };
 
 export const formatPrice = (price) =>
-  price.toLocaleString('es-ES', {
+  price.toLocaleString('es-CU', {
     maximumFractionDigits: 2,
   });
 
