@@ -57,13 +57,13 @@ const SignupPage = () => {
         lastName: lastName.trim(),
       });
 
-      // actualizar AuthContext con datos
+      // update AuthContext with data
       updateUserAuth({ user, token });
 
-      // mostrar toast de éxito
-      toastHandler(ToastType.Success, `¡Registro exitoso! Bienvenido ${firstName} ${lastName}`);
+      // show success toast
+      toastHandler(ToastType.Success, `Registro exitoso`);
 
-      // si el usuario viene directamente a '/signup' desde url, entonces state será null, después del registro exitoso, el usuario debe ser dirigido a la página de inicio
+      // if user directly comes to '/signup' from url, so state will be null, after successful registration, user should be directed to home page
       navigate(signupPageLocation?.state?.from ?? '/');
     } catch (error) {
       toastHandler(ToastType.Error, error.response.data.errors[0]);
@@ -73,14 +73,14 @@ const SignupPage = () => {
     setIsSignupFormLoading(false);
   };
 
-  // si el usuario está registrado y trata de hacer Signup '/signup' a través de url, mostrar esto y navegar a home usando useNavigateIfRegistered().
+  //  if user is registered and trying to Signup '/signup' through url, show this and navigate to home using useNavigateIfRegistered().
   if (!!user) {
     return <main className='full-page'></main>;
   }
 
   return (
     <LoginAndSignupLayout>
-      <Title>Crear Nueva Cuenta</Title>
+      <Title>Registrarse</Title>
 
       <form onSubmit={handleCreateAccount}>
         <FormRow
@@ -88,7 +88,7 @@ const SignupPage = () => {
           type='text'
           name='firstName'
           id='firstName'
-          placeholder='Tu nombre'
+          placeholder='Jethalal'
           value={userInputs.firstName}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
@@ -98,7 +98,7 @@ const SignupPage = () => {
           type='text'
           name='lastName'
           id='lastName'
-          placeholder='Tu apellido'
+          placeholder='Gada'
           value={userInputs.lastName}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
@@ -109,17 +109,17 @@ const SignupPage = () => {
           type='email'
           name='email'
           id='email'
-          placeholder='tu.email@gmail.com'
+          placeholder='jethalal.gada@gmail.com'
           value={userInputs.email}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
         />
 
         <PasswordRow
-          text='Contraseña'
+          text='Ingresa tu Contraseña'
           name='passwordMain'
           id='passwordMain'
-          placeholder='Crea una contraseña segura'
+          placeholder='babitaji1234'
           value={userInputs.passwordMain}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
@@ -128,33 +128,29 @@ const SignupPage = () => {
           text='Confirmar Contraseña'
           name='passwordConfirm'
           id='passwordConfirm'
-          placeholder='Repite tu contraseña'
+          placeholder=''
           value={userInputs.passwordConfirm}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
         />
 
-        <button 
-          className='btn btn-block' 
-          type='submit'
-          disabled={isSignupFormLoading}
-        >
+        <button className='btn btn-block' type='submit'>
           {isSignupFormLoading ? (
             <span className='loader-2'></span>
           ) : (
-            'Crear Cuenta'
+            'Crear Nueva Cuenta'
           )}
         </button>
       </form>
 
       <div>
         <span>
-          ¿Ya tienes una cuenta?{' '}
+          ¿Ya estás registrado?{' '}
           <Link
             to='/login'
             state={{ from: signupPageLocation?.state?.from ?? '/' }}
           >
-            inicia sesión aquí
+            iniciar sesión
           </Link>
         </span>
       </div>

@@ -7,7 +7,7 @@ const Price = ({ amount }) => {
 
   return (
     <span>
-      {isAmountNegative && '-'} $ {formatPrice(amountOnUI)} CUP
+      {isAmountNegative && '-'} ₹ {formatPrice(amountOnUI)}
     </span>
   );
 };
