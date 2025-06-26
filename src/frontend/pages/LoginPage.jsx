@@ -36,7 +36,7 @@ const LoginPage = () => {
     setUserInputs({ ...userInputs, [e.target.name]: e.target.value });
   };
 
-  // used for both the buttons
+  // usado para ambos botones
   const handleSubmit = async (e, clickType) => {
     e.preventDefault();
 
@@ -52,19 +52,19 @@ const LoginPage = () => {
     try {
       const { user, token } = await loginUserService(userInfo);
 
-      // update AuthContext with data
+      // actualizar AuthContext con datos
       updateUserAuth({ user, token });
 
-      // store this data in localStorage
+      // almacenar estos datos en localStorage
       setIntoLocalStorage(LOCAL_STORAGE_KEYS.User, user);
       setIntoLocalStorage(LOCAL_STORAGE_KEYS.Token, token);
 
-      // show success toast
+      // mostrar toast de éxito
       toastHandler(
         ToastType.Success,
         `Bienvenido ${user.firstName} ${user.lastName} 😎`
       );
-      // if non-registered user comes from typing '/login' at the url, after success redirect it to '/'
+      // si el usuario no registrado viene de escribir '/login' en la url, después del éxito redirigirlo a '/'
       navigate(locationOfLogin?.state?.from ?? '/');
     } catch ({ response }) {
       const errorText = response?.data?.errors[0].split('.')[0];
@@ -74,7 +74,7 @@ const LoginPage = () => {
     setActiveBtnLoader('');
   };
 
-  //  if user is registered and trying to login through url, show this and navigate to home using useNavigateIfRegistered().
+  // si el usuario está registrado y trata de hacer login a través de url, mostrar esto y navegar a home usando useNavigateIfRegistered().
   if (!!user) {
     return <main className='full-page'></main>;
   }
@@ -116,16 +116,17 @@ const LoginPage = () => {
           )}
         </button>
 
-        {/* this Guest Login button is out of the form  */}
+        {/* este botón de Login de Invitado está fuera del formulario */}
         <button
           disabled={!!activeBtnLoader}
           className='btn btn-block'
+          type='button'
           onClick={(e) => handleSubmit(e, LOGIN_CLICK_TYPE.GuestClick)}
         >
           {activeBtnLoader === LOGIN_CLICK_TYPE.GuestClick ? (
             <span className='loader-2'></span>
           ) : (
-            'Iniciar como invitado'
+            'Iniciar como Invitado (Jethalal Gada)'
           )}
         </button>
       </form>
@@ -137,12 +138,10 @@ const LoginPage = () => {
             to='/signup'
             state={{ from: locationOfLogin?.state?.from ?? '/' }}
           >
-            regístrate
+            regístrate aquí
           </Link>
         </span>
       </div>
     </LoginAndSignupLayout>
   );
 };
-
-export default LoginPage;

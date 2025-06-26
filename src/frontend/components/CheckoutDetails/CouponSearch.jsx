@@ -33,7 +33,7 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
   };
 
   const handleCouponClick = (couponClicked) => {
-    //  for mobile, there is no tooltip and buttons not disabled for the following condition
+    //  para móvil, no hay tooltip y los botones no están deshabilitados para la siguiente condición
     if (
       isMobile &&
       totalAmountFromContext < couponClicked.minCartPriceRequired
@@ -49,7 +49,7 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
 
     setCouponSearchInput(couponClicked.couponCode);
 
-    // if activeCoupon and the couponClicked in suggestion is same do nothing
+    // si activeCoupon y el couponClicked en sugerencia es el mismo no hacer nada
     if (activeCoupon?.couponCode === couponClicked.couponCode) {
       return;
     }
@@ -72,7 +72,7 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
         couponCode.toUpperCase() === couponSearchInput.toUpperCase()
     );
 
-    //  user input based coupon not found, so all coupons suggestion visible
+    //  cupón basado en entrada del usuario no encontrado, así que todas las sugerencias de cupones visibles
     if (!couponFound) {
       toastHandler(
         ToastType.Error,
@@ -92,12 +92,12 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
       return;
     }
 
-    // if couponSearchInput and activeCouponCode is same, do nothing
+    // si couponSearchInput y activeCouponCode es el mismo, no hacer nada
     if (activeCoupon?.id === couponFound.id) {
       return;
     }
 
-    // else update and show toast
+    // sino actualizar y mostrar toast
     updateActiveCoupon(couponFound);
   };
 
