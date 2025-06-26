@@ -40,9 +40,9 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
     ) {
       toastHandler(
         ToastType.Info,
-        `Compra por encima de ₹${formatPrice(
+        `Compra por encima de $${formatPrice(
           couponClicked.minCartPriceRequired
-        )} para aplicar`
+        )} CUP para aplicar`
       );
       return;
     }
