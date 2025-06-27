@@ -6,8 +6,8 @@ import {
   Title,
 } from '../components';
 import { useFormInput, useNavigateIfRegistered } from '../hooks';
-import { toastHandler } from '../utils/utils';
-import { ToastType } from '../constants/constants';
+import { setIntoLocalStorage, toastHandler } from '../utils/utils';
+import { ToastType, LOCAL_STORAGE_KEYS } from '../constants/constants';
 import { useState } from 'react';
 import { signupService } from '../Services/services';
 import { useAuthContext } from '../contexts/AuthContextProvider';
@@ -32,16 +32,44 @@ const SignupPage = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
 
+    // Validaciones del formulario
+    if (!userInputs.firstName.trim()) {
+      toastHandler(ToastType.Error, 'Por favor ingresa tu nombre');
+      return;
+    }
+
+    if (!userInputs.lastName.trim()) {
+      toastHandler(ToastType.Error, 'Por favor ingresa tu apellido');
+      return;
+    }
+
+    if (!userInputs.email.trim()) {
+      toastHandler(ToastType.Error, 'Por favor ingresa tu email');
+      return;
+    }
+
+    // Validación de formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userInputs.email.trim())) {
+      toastHandler(ToastType.Error, 'Por favor ingresa un email válido');
+      return;
+    }
+
+    if (!userInputs.passwordMain.trim()) {
+      toastHandler(ToastType.Error, 'Por favor ingresa una contraseña');
+      return;
+    }
+
+    if (userInputs.passwordMain.length < 6) {
+      toastHandler(ToastType.Error, 'La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
     if (userInputs.passwordMain !== userInputs.passwordConfirm) {
       toastHandler(
         ToastType.Error,
         '¡Las contraseñas no coinciden!'
       );
-      return;
-    }
-
-    if (!userInputs.firstName.trim()) {
-      toastHandler(ToastType.Error, 'Por favor completa todos los campos');
       return;
     }
 
@@ -60,14 +88,26 @@ const SignupPage = () => {
       // update AuthContext with data
       updateUserAuth({ user, token });
 
+      // store this data in localStorage
+      setIntoLocalStorage(LOCAL_STORAGE_KEYS.User, user);
+      setIntoLocalStorage(LOCAL_STORAGE_KEYS.Token, token);
+
       // show success toast
-      toastHandler(ToastType.Success, `Registro exitoso`);
+      toastHandler(ToastType.Success, `¡Registro exitoso! Bienvenido ${firstName} 🎉`);
 
       // if user directly comes to '/signup' from url, so state will be null, after successful registration, user should be directed to home page
       navigate(signupPageLocation?.state?.from ?? '/');
     } catch (error) {
-      toastHandler(ToastType.Error, error.response.data.errors[0]);
-      console.error(error.response);
+      console.error('Error de registro:', error);
+      let errorText = 'Error al crear la cuenta. Intenta nuevamente.';
+      
+      if (error?.response?.data?.errors && error.response.data.errors.length > 0) {
+        errorText = error.response.data.errors[0];
+      } else if (error?.message) {
+        errorText = error.message;
+      }
+      
+      toastHandler(ToastType.Error, errorText);
     }
 
     setIsSignupFormLoading(false);
@@ -88,7 +128,7 @@ const SignupPage = () => {
           type='text'
           name='firstName'
           id='firstName'
-          placeholder='Jethalal'
+          placeholder='Tu nombre'
           value={userInputs.firstName}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
@@ -98,7 +138,7 @@ const SignupPage = () => {
           type='text'
           name='lastName'
           id='lastName'
-          placeholder='Gada'
+          placeholder='Tu apellido'
           value={userInputs.lastName}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
@@ -109,17 +149,17 @@ const SignupPage = () => {
           type='email'
           name='email'
           id='email'
-          placeholder='jethalal.gada@gmail.com'
+          placeholder='tu-email@ejemplo.com'
           value={userInputs.email}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
         />
 
         <PasswordRow
-          text='Ingresa tu Contraseña'
+          text='Contraseña (mínimo 6 caracteres)'
           name='passwordMain'
           id='passwordMain'
-          placeholder='babitaji1234'
+          placeholder='Tu contraseña'
           value={userInputs.passwordMain}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
@@ -128,13 +168,17 @@ const SignupPage = () => {
           text='Confirmar Contraseña'
           name='passwordConfirm'
           id='passwordConfirm'
-          placeholder=''
+          placeholder='Confirma tu contraseña'
           value={userInputs.passwordConfirm}
           handleChange={handleInputChange}
           disabled={isSignupFormLoading}
         />
 
-        <button className='btn btn-block' type='submit'>
+        <button 
+          className='btn btn-block' 
+          type='submit'
+          disabled={isSignupFormLoading}
+        >
           {isSignupFormLoading ? (
             <span className='loader-2'></span>
           ) : (

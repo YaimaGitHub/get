@@ -4,20 +4,37 @@ import jwt_decode from "jwt-decode";
 
 export const requiresAuth = function (request) {
   const encodedToken = request.requestHeaders.authorization;
-  const decodedToken = jwt_decode(
-    encodedToken,
-    process.env.REACT_APP_JWT_SECRET
-  );
-  if (decodedToken) {
-    const user = this.db.users.findBy({ email: decodedToken.email });
-    if (user) {
-      return user._id;
-    }
+  if (!encodedToken) {
+    return new Response(
+      401,
+      {},
+      { errors: ["Token de autorización requerido. Por favor inicia sesión."] }
+    );
   }
+
+  try {
+    const decodedToken = jwt_decode(
+      encodedToken,
+      process.env.REACT_APP_JWT_SECRET || 'Jai Radha Madhav'
+    );
+    if (decodedToken) {
+      const user = this.db.users.findBy({ email: decodedToken.email });
+      if (user) {
+        return user._id;
+      }
+    }
+  } catch (error) {
+    return new Response(
+      401,
+      {},
+      { errors: ["Token inválido. Por favor inicia sesión nuevamente."] }
+    );
+  }
+
   return new Response(
     401,
     {},
-    { errors: ["The token is invalid. Unauthorized access error."] }
+    { errors: ["Token inválido. Acceso no autorizado."] }
   );
 };
 

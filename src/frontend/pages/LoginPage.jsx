@@ -43,6 +43,18 @@ const LoginPage = () => {
     const isGuestClick = clickType === LOGIN_CLICK_TYPE.GuestClick;
     const userInfo = isGuestClick ? TEST_USER : userInputs;
 
+    // Validaciones básicas para login manual
+    if (!isGuestClick) {
+      if (!userInputs.email.trim()) {
+        toastHandler(ToastType.Error, 'Por favor ingresa tu email');
+        return;
+      }
+      if (!userInputs.password.trim()) {
+        toastHandler(ToastType.Error, 'Por favor ingresa tu contraseña');
+        return;
+      }
+    }
+
     setActiveBtnLoader(clickType);
 
     if (isGuestClick) {
@@ -62,12 +74,20 @@ const LoginPage = () => {
       // show success toast
       toastHandler(
         ToastType.Success,
-        `Bienvenido ${user.firstName} ${user.lastName} 😎`
+        `¡Bienvenido ${user.firstName} ${user.lastName}! 😎`
       );
       // if non-registered user comes from typing '/login' at the url, after success redirect it to '/'
       navigate(locationOfLogin?.state?.from ?? '/');
-    } catch ({ response }) {
-      const errorText = response?.data?.errors[0].split('.')[0];
+    } catch (error) {
+      console.error('Error de login:', error);
+      let errorText = 'Error al iniciar sesión. Intenta nuevamente.';
+      
+      if (error?.response?.data?.errors && error.response.data.errors.length > 0) {
+        errorText = error.response.data.errors[0];
+      } else if (error?.message) {
+        errorText = error.message;
+      }
+      
       toastHandler(ToastType.Error, errorText);
     }
 
@@ -89,7 +109,7 @@ const LoginPage = () => {
           type='email'
           name='email'
           id='email'
-          placeholder='jethalal.gada@gmail.com'
+          placeholder='tu-email@ejemplo.com'
           value={userInputs.email}
           handleChange={handleUserInput}
           disabled={!!activeBtnLoader}
@@ -98,7 +118,7 @@ const LoginPage = () => {
           text='Ingresa tu Contraseña'
           name='password'
           id='password'
-          placeholder='babitaji1234'
+          placeholder='Tu contraseña'
           value={userInputs.password}
           handleChange={handleUserInput}
           disabled={!!activeBtnLoader}
@@ -120,12 +140,13 @@ const LoginPage = () => {
         <button
           disabled={!!activeBtnLoader}
           className='btn btn-block'
+          type='button'
           onClick={(e) => handleSubmit(e, LOGIN_CLICK_TYPE.GuestClick)}
         >
           {activeBtnLoader === LOGIN_CLICK_TYPE.GuestClick ? (
             <span className='loader-2'></span>
           ) : (
-            'Iniciar como invitado'
+            'Iniciar como Invitado'
           )}
         </button>
       </form>
@@ -137,7 +158,7 @@ const LoginPage = () => {
             to='/signup'
             state={{ from: locationOfLogin?.state?.from ?? '/' }}
           >
-            regístrate
+            regístrate aquí
           </Link>
         </span>
       </div>

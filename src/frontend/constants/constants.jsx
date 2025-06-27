@@ -35,9 +35,16 @@ export const SORT_TYPE = {
 
 export const RATINGS = [4, 3, 2, 1];
 
+// Usuario de prueba predefinido para login como invitado
 export const TEST_USER = {
   email: 'jethalal.gada@gmail.com',
   password: 'babitaji1234',
+};
+
+// Usuario alternativo para pruebas
+export const GUEST_USER = {
+  email: 'invitado@tienda.com',
+  password: '123456',
 };
 
 export const LOCAL_STORAGE_KEYS = {
