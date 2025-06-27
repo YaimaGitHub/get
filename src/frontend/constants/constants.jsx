@@ -104,6 +104,31 @@ export const ALL_STATES = [
   'Región de Murcia',
 ];
 
+// Tipos de servicio
+export const SERVICE_TYPES = {
+  HOME_DELIVERY: 'home_delivery',
+  PICKUP: 'pickup'
+};
+
+// Zonas de Santiago de Cuba con costos de entrega
+export const SANTIAGO_ZONES = [
+  { id: 'centro', name: 'Centro Histórico', cost: 50 },
+  { id: 'vista_alegre', name: 'Vista Alegre', cost: 75 },
+  { id: 'sueno', name: 'Sueño', cost: 60 },
+  { id: 'san_pedrito', name: 'San Pedrito', cost: 80 },
+  { id: 'altamira', name: 'Altamira', cost: 70 },
+  { id: 'reparto_flores', name: 'Reparto Flores', cost: 65 },
+  { id: 'chicharrones', name: 'Chicharrones', cost: 85 },
+  { id: 'los_olmos', name: 'Los Olmos', cost: 90 },
+  { id: 'santa_barbara', name: 'Santa Bárbara', cost: 95 },
+  { id: 'micro_9', name: 'Micro 9', cost: 100 },
+  { id: 'micro_4', name: 'Micro 4', cost: 100 },
+  { id: 'alameda', name: 'Alameda', cost: 55 },
+  { id: 'puerto', name: 'Puerto', cost: 45 },
+  { id: 'siboney', name: 'Siboney', cost: 120 },
+  { id: 'ciudamar', name: 'Ciudamar', cost: 110 },
+];
+
 export const COUPONS = [
   {
     id: uuid(),
@@ -136,10 +161,13 @@ export const COUPONS = [
 ];
 
 export const CHARGE_AND_DISCOUNT = {
-  deliveryCharge: 100,
-  discount: -200,
+  deliveryCharge: 0, // Gratis por defecto
+  discount: 0, // Sin descuento por defecto
 };
 
 export const MIN_DISTANCE_BETWEEN_THUMBS = 1000;
 
 export const MAX_RESPONSES_IN_CACHE_TO_STORE = 50;
+
+// WhatsApp de la tienda
+export const STORE_WHATSAPP = '+53 54690878';

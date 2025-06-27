@@ -1,4 +1,5 @@
 import { useAllProductsContext } from '../../contexts/ProductsContextProvider';
+import { SERVICE_TYPES, SANTIAGO_ZONES } from '../../constants/constants';
 import styles from './AddressCard.module.css';
 
 const AddressCard = ({
@@ -9,11 +10,12 @@ const AddressCard = ({
     addressId,
     username,
     mobile,
-    alternate,
+    serviceType,
+    zone,
     addressInfo,
-    pincode,
-    city,
-    state,
+    receiverName,
+    receiverPhone,
+    additionalInfo,
   } = singleAddress;
 
   const { deleteAddressDispatch, timedMainPageLoader } =
@@ -24,21 +26,28 @@ const AddressCard = ({
     deleteAddressDispatch(addressId);
   };
 
+  const isHomeDelivery = serviceType === SERVICE_TYPES.HOME_DELIVERY;
+  const zoneName = isHomeDelivery ? SANTIAGO_ZONES.find(z => z.id === zone)?.name : '';
+
   return (
     <article className={styles.addressCard}>
       <h3>{username}</h3>
       <div className={styles.row}>
-        <span>{mobile}</span>
-        {!!alternate && <span>{alternate}</span>}
+        <span>Móvil: {mobile}</span>
       </div>
 
-      <p>{addressInfo}</p>
-      <p>{pincode}</p>
+      <p><strong>Servicio:</strong> {isHomeDelivery ? 'Entrega a domicilio' : 'Recoger en local'}</p>
 
-      <div className={styles.row}>
-        <span>{city}</span>
-        <span>{state}</span>
-      </div>
+      {isHomeDelivery ? (
+        <>
+          <p><strong>Zona:</strong> {zoneName}</p>
+          <p><strong>Dirección:</strong> {addressInfo}</p>
+          <p><strong>Recibe:</strong> {receiverName}</p>
+          <p><strong>Teléfono:</strong> {receiverPhone}</p>
+        </>
+      ) : (
+        additionalInfo && <p><strong>Información adicional:</strong> {additionalInfo}</p>
+      )}
 
       <div className='btn-container'>
         <button
@@ -48,7 +57,7 @@ const AddressCard = ({
           Editar
         </button>
         <button onClick={handleDelete} className='btn btn-danger'>
-          eliminar
+          Eliminar
         </button>
       </div>
     </article>

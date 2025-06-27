@@ -1,3 +1,4 @@
+import { SERVICE_TYPES, SANTIAGO_ZONES } from '../../constants/constants';
 import styles from './CheckoutAddressCard.module.css';
 
 const CheckoutAddressCard = ({
@@ -5,10 +6,22 @@ const CheckoutAddressCard = ({
   activeAddressId,
   handleSelect,
 }) => {
-  const { addressId, username, city, state, pincode, addressInfo, mobile } =
-    singleAddress;
+  const { 
+    addressId, 
+    username, 
+    serviceType, 
+    zone, 
+    addressInfo, 
+    mobile,
+    receiverName,
+    receiverPhone,
+    additionalInfo 
+  } = singleAddress;
 
   const isActiveAddress = addressId === activeAddressId;
+  const isHomeDelivery = serviceType === SERVICE_TYPES.HOME_DELIVERY;
+  const zoneName = isHomeDelivery ? SANTIAGO_ZONES.find(z => z.id === zone)?.name : '';
+
   return (
     <article
       className={
@@ -19,14 +32,20 @@ const CheckoutAddressCard = ({
     >
       <label htmlFor={addressId}>
         <h4 className='bold'>{username}</h4>
-        <p>
-          {addressInfo}, {city}, {state}, Pincode - {pincode}
-        </p>
-        <p>
-          {' '}
-          <span className='bold'>Mobile: </span>
-          {mobile}
-        </p>
+        <p><strong>Servicio:</strong> {isHomeDelivery ? 'Entrega a domicilio' : 'Recoger en local'}</p>
+        
+        {isHomeDelivery ? (
+          <>
+            <p><strong>Zona:</strong> {zoneName}</p>
+            <p><strong>Dirección:</strong> {addressInfo}</p>
+            <p><strong>Recibe:</strong> {receiverName}</p>
+            <p><strong>Teléfono:</strong> {receiverPhone}</p>
+          </>
+        ) : (
+          additionalInfo && <p><strong>Info adicional:</strong> {additionalInfo}</p>
+        )}
+        
+        <p><strong>Móvil contacto:</strong> {mobile}</p>
       </label>
 
       <input
