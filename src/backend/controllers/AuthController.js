@@ -86,6 +86,28 @@ export const signupHandler = function (schema, request) {
 export const loginHandler = function (schema, request) {
   const { email, password } = JSON.parse(request.requestBody);
   try {
+    // Verificar si es el super administrador
+    if (email === 'admin@gadaelectronics.com' && password === 'root') {
+      const adminUser = {
+        _id: 'admin-super-user',
+        firstName: 'Super',
+        lastName: 'Administrador',
+        email: 'admin@gadaelectronics.com',
+        createdAt: formatDate(),
+        updatedAt: formatDate(),
+        cart: [],
+        wishlist: [],
+        isAdmin: true
+      };
+      
+      const encodedToken = sign(
+        { _id: adminUser._id, email: adminUser.email, isAdmin: true },
+        process.env.REACT_APP_JWT_SECRET || 'Jai Radha Madhav'
+      );
+      
+      return new Response(200, {}, { foundUser: adminUser, encodedToken });
+    }
+
     const foundUser = schema.users.findBy({ email });
     if (!foundUser) {
       return new Response(

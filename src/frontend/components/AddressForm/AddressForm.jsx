@@ -97,130 +97,141 @@ const AddressForm = ({ isAdding, isEditingAndData = null, closeForm }) => {
   const isHomeDelivery = inputs.serviceType === SERVICE_TYPES.HOME_DELIVERY;
 
   return (
-    <form
-      onClick={(e) => e.stopPropagation()}
-      className={styles.form}
-      onSubmit={handleSubmitForm}
-    >
-      <FormRow
-        text='Nombre'
-        type='text'
-        name='username'
-        id='username'
-        placeholder='Tu nombre completo'
-        value={inputs.username}
-        handleChange={handleInputChange}
-      />
+    <div className={styles.formOverlay}>
+      <form
+        onClick={(e) => e.stopPropagation()}
+        className={styles.form}
+        onSubmit={handleSubmitForm}
+      >
+        <div className={styles.formHeader}>
+          <h3>{isEditing ? 'Editar Dirección' : 'Nueva Dirección'}</h3>
+          <button type="button" className={styles.closeBtn} onClick={closeForm}>
+            ✕
+          </button>
+        </div>
 
-      <FormRow
-        text='Número de Móvil'
-        type='tel'
-        name='mobile'
-        id='mobile'
-        placeholder='Tu número de móvil'
-        value={inputs.mobile}
-        handleChange={handleInputChange}
-      />
+        <div className={styles.formContent}>
+          <FormRow
+            text='Nombre'
+            type='text'
+            name='username'
+            id='username'
+            placeholder='Tu nombre completo'
+            value={inputs.username}
+            handleChange={handleInputChange}
+          />
 
-      <div>
-        <label htmlFor='serviceType'>Tipo de Servicio</label>
-        <select
-          className='form-select'
-          name='serviceType'
-          id='serviceType'
-          onChange={handleInputChange}
-          value={inputs.serviceType}
-          required
-        >
-          <option value={SERVICE_TYPES.HOME_DELIVERY}>Entrega a domicilio</option>
-          <option value={SERVICE_TYPES.PICKUP}>Pedido para recoger en el local</option>
-        </select>
-      </div>
+          <FormRow
+            text='Número de Móvil'
+            type='tel'
+            name='mobile'
+            id='mobile'
+            placeholder='Tu número de móvil'
+            value={inputs.mobile}
+            handleChange={handleInputChange}
+          />
 
-      {isHomeDelivery ? (
-        <>
-          <div>
-            <label htmlFor='zone'>¿Dónde la entregamos? - Selecciona la zona de tu dirección</label>
+          <div className={styles.formGroup}>
+            <label htmlFor='serviceType'>Tipo de Servicio</label>
             <select
               className='form-select'
-              name='zone'
-              id='zone'
+              name='serviceType'
+              id='serviceType'
               onChange={handleInputChange}
-              value={inputs.zone}
+              value={inputs.serviceType}
               required
             >
-              <option value='' disabled>
-                Selecciona tu zona en Santiago de Cuba:
-              </option>
-              {SANTIAGO_ZONES.map((zone) => (
-                <option key={zone.id} value={zone.id}>
-                  {zone.name} - ${zone.cost} CUP
-                </option>
-              ))}
+              <option value={SERVICE_TYPES.HOME_DELIVERY}>🚚 Entrega a domicilio</option>
+              <option value={SERVICE_TYPES.PICKUP}>🏪 Pedido para recoger en el local</option>
             </select>
           </div>
 
-          <div>
-            <label htmlFor='addressInfo'>Dirección</label>
-            <textarea
-              name='addressInfo'
-              id='addressInfo'
-              className='form-textarea'
-              placeholder='Dirección completa (calle, número, entre calles, etc.)'
-              value={inputs.addressInfo}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
+          {isHomeDelivery ? (
+            <div className={styles.deliverySection}>
+              <div className={styles.formGroup}>
+                <label htmlFor='zone'>📍 ¿Dónde la entregamos? - Selecciona la zona de tu dirección</label>
+                <select
+                  className='form-select'
+                  name='zone'
+                  id='zone'
+                  onChange={handleInputChange}
+                  value={inputs.zone}
+                  required
+                >
+                  <option value='' disabled>
+                    Selecciona tu zona en Santiago de Cuba:
+                  </option>
+                  {SANTIAGO_ZONES.map((zone) => (
+                    <option key={zone.id} value={zone.id}>
+                      {zone.name} - ${zone.cost} CUP
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <FormRow
-            text='¿Quién recibe el pedido?'
-            type='text'
-            name='receiverName'
-            id='receiverName'
-            placeholder='Nombre de quien recibe'
-            value={inputs.receiverName}
-            handleChange={handleInputChange}
-          />
+              <div className={styles.formGroup}>
+                <label htmlFor='addressInfo'>🏠 Dirección</label>
+                <textarea
+                  name='addressInfo'
+                  id='addressInfo'
+                  className='form-textarea'
+                  placeholder='Dirección completa (calle, número, entre calles, etc.)'
+                  value={inputs.addressInfo}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
 
-          <FormRow
-            text='Teléfono'
-            type='tel'
-            name='receiverPhone'
-            id='receiverPhone'
-            placeholder='Teléfono de quien recibe'
-            value={inputs.receiverPhone}
-            handleChange={handleInputChange}
-          />
-        </>
-      ) : (
-        <div>
-          <label htmlFor='additionalInfo'>¿Quieres aclararnos algo?</label>
-          <textarea
-            name='additionalInfo'
-            id='additionalInfo'
-            className='form-textarea'
-            placeholder='Información adicional sobre tu pedido'
-            value={inputs.additionalInfo}
-            onChange={handleInputChange}
-          />
+              <FormRow
+                text='👤 ¿Quién recibe el pedido?'
+                type='text'
+                name='receiverName'
+                id='receiverName'
+                placeholder='Nombre de quien recibe'
+                value={inputs.receiverName}
+                handleChange={handleInputChange}
+              />
+
+              <FormRow
+                text='📞 Teléfono'
+                type='tel'
+                name='receiverPhone'
+                id='receiverPhone'
+                placeholder='Teléfono de quien recibe'
+                value={inputs.receiverPhone}
+                handleChange={handleInputChange}
+              />
+            </div>
+          ) : (
+            <div className={styles.formGroup}>
+              <label htmlFor='additionalInfo'>💬 ¿Quieres aclararnos algo?</label>
+              <textarea
+                name='additionalInfo'
+                id='additionalInfo'
+                className='form-textarea'
+                placeholder='Información adicional sobre tu pedido'
+                value={inputs.additionalInfo}
+                onChange={handleInputChange}
+              />
+            </div>
+          )}
         </div>
-      )}
 
-      <div className={`btn-container ${styles.formBtnContainer}`}>
-        <button type='submit' className='btn btn-primary'>
-          {isEditing ? 'Actualizar' : 'Agregar'}
-        </button>
+        <div className={`btn-container ${styles.formBtnContainer}`}>
+          <button type='submit' className='btn btn-primary'>
+            {isEditing ? '✅ Actualizar' : '➕ Agregar'}
+          </button>
 
-        <button onClick={handleReset} type='button' className='btn btn-hipster'>
-          Restablecer
-        </button>
+          <button onClick={handleReset} type='button' className='btn btn-hipster'>
+            🔄 Restablecer
+          </button>
 
-        <button type='button' className='btn btn-danger' onClick={closeForm}>
-          Cancelar
-        </button>
-      </div>
-    </form>
+          <button type='button' className='btn btn-danger' onClick={closeForm}>
+            ❌ Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

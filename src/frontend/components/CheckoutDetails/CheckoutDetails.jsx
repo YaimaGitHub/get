@@ -31,6 +31,7 @@ const CheckoutDetails = ({
   } = useAuthContext();
   const navigate = useNavigate();
   const [activeCoupon, setActiveCoupon] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Obtener la dirección seleccionada
   const selectedAddress = addressListFromContext.find(
@@ -66,20 +67,26 @@ const CheckoutDetails = ({
     const orderNumber = generateOrderNumber();
     
     let message = `🛒 *NUEVO PEDIDO #${orderNumber}*\n\n`;
-    message += `👤 *Cliente:* ${firstName} ${lastName}\n`;
+    message += `═══════════════════════════════\n`;
+    message += `👤 *DATOS DEL CLIENTE*\n`;
+    message += `═══════════════════════════════\n`;
+    message += `📝 *Nombre:* ${firstName} ${lastName}\n`;
     message += `📧 *Email:* ${email}\n\n`;
     
     // Información del servicio
+    message += `🚚 *INFORMACIÓN DE ENTREGA*\n`;
+    message += `═══════════════════════════════\n`;
+    
     if (selectedAddress.serviceType === SERVICE_TYPES.HOME_DELIVERY) {
       const zoneName = SANTIAGO_ZONES.find(z => z.id === selectedAddress.zone)?.name;
-      message += `🚚 *Servicio:* Entrega a domicilio\n`;
+      message += `📦 *Tipo:* Entrega a domicilio\n`;
       message += `📍 *Zona:* ${zoneName}\n`;
       message += `🏠 *Dirección:* ${selectedAddress.addressInfo}\n`;
       message += `👤 *Recibe:* ${selectedAddress.receiverName}\n`;
       message += `📱 *Teléfono recibe:* ${selectedAddress.receiverPhone}\n`;
       message += `💰 *Costo entrega:* $${deliveryCost} CUP\n`;
     } else {
-      message += `🏪 *Servicio:* Recoger en local\n`;
+      message += `📦 *Tipo:* Recoger en local\n`;
       if (selectedAddress.additionalInfo) {
         message += `📝 *Info adicional:* ${selectedAddress.additionalInfo}\n`;
       }
@@ -88,28 +95,47 @@ const CheckoutDetails = ({
     message += `📞 *Móvil contacto:* ${selectedAddress.mobile}\n\n`;
     
     // Productos
-    message += `📦 *PRODUCTOS:*\n`;
+    message += `📦 *PRODUCTOS SOLICITADOS*\n`;
+    message += `═══════════════════════════════\n`;
     cartFromContext.forEach((item, index) => {
-      message += `${index + 1}. ${item.name}\n`;
-      message += `   Cantidad: ${item.qty}\n`;
-      message += `   Precio: $${item.price} CUP c/u\n`;
-      message += `   Subtotal: $${item.price * item.qty} CUP\n\n`;
+      const colorHex = item.colors[0]?.color || '#000000';
+      message += `${index + 1}. 📱 *${item.name}*\n`;
+      message += `   🎨 Color: ${colorHex}\n`;
+      message += `   📊 Cantidad: ${item.qty} unidad${item.qty > 1 ? 'es' : ''}\n`;
+      message += `   💵 Precio unitario: $${item.price.toLocaleString()} CUP\n`;
+      message += `   💰 Subtotal: $${(item.price * item.qty).toLocaleString()} CUP\n`;
+      message += `   ─────────────────────────\n`;
     });
     
     // Resumen de precios
-    message += `💵 *RESUMEN:*\n`;
-    message += `Subtotal productos: $${totalAmountFromContext} CUP\n`;
+    message += `\n💵 *RESUMEN DE COSTOS*\n`;
+    message += `═══════════════════════════════\n`;
+    message += `🛍️ Subtotal productos: $${totalAmountFromContext.toLocaleString()} CUP\n`;
     
     if (activeCoupon) {
-      message += `Descuento (${activeCoupon.couponCode}): $${Math.abs(priceAfterCouponApplied)} CUP\n`;
+      message += `🎫 Descuento (${activeCoupon.couponCode}): -$${Math.abs(priceAfterCouponApplied).toLocaleString()} CUP\n`;
     }
     
     if (deliveryCost > 0) {
-      message += `Costo entrega: $${deliveryCost} CUP\n`;
+      message += `🚚 Costo entrega: $${deliveryCost.toLocaleString()} CUP\n`;
     }
     
-    message += `*TOTAL: $${finalPriceToPay} CUP*\n\n`;
-    message += `⏰ Pedido realizado: ${new Date().toLocaleString('es-CU')}`;
+    message += `═══════════════════════════════\n`;
+    message += `💰 *TOTAL A PAGAR: $${finalPriceToPay.toLocaleString()} CUP*\n`;
+    message += `═══════════════════════════════\n\n`;
+    
+    message += `⏰ *Fecha del pedido:* ${new Date().toLocaleString('es-CU', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}\n\n`;
+    
+    message += `🏪 *Gada Electronics*\n`;
+    message += `"Naam hi kaafi hai" ✨\n`;
+    message += `¡Gracias por confiar en nosotros! 🙏`;
 
     // Codificar el mensaje para URL
     const encodedMessage = encodeURIComponent(message);
@@ -127,7 +153,12 @@ const CheckoutDetails = ({
       return;
     }
 
+    setIsProcessing(true);
+
     try {
+      // Animación de procesamiento
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
       const orderNumber = await sendToWhatsApp({
         orderNumber: generateOrderNumber(),
         customer: { firstName, lastName, email },
@@ -145,22 +176,26 @@ const CheckoutDetails = ({
       updateCheckoutStatus({ showSuccessMsg: true });
 
       Popper();
-      toastHandler(ToastType.Success, `Pedido #${orderNumber} enviado exitosamente`);
+      toastHandler(ToastType.Success, `🎉 Pedido #${orderNumber} enviado exitosamente`);
 
       timer.current = setTimeout(() => {
         updateCheckoutStatus({ showSuccessMsg: false });
         navigate('/');
-      }, 3000);
+      }, 4000);
 
     } catch (error) {
       console.error('Error al procesar el pedido:', error);
       toastHandler(ToastType.Error, 'Error al procesar el pedido');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
     <article className={styles.checkout}>
-      <h3 className='text-center'>Detalles del Precio</h3>
+      <div className={styles.checkoutHeader}>
+        <h3 className='text-center'>💰 Detalles del Precio</h3>
+      </div>
 
       <CouponSearch
         activeCoupon={activeCoupon}
@@ -169,48 +204,64 @@ const CheckoutDetails = ({
 
       <hr />
 
-      <div className={styles.row}>
-        <span>
-          Precio ({totalCountFromContext} artículo{totalCountFromContext > 1 && 's'})
-        </span>
-        <Price amount={totalAmountFromContext} />
-      </div>
-
-      {activeCoupon && (
+      <div className={styles.priceBreakdown}>
         <div className={styles.row}>
-          <div className={styles.couponApplied}>
-            <VscChromeClose
-              type='button'
-              className={styles.closeBtn}
-              onClick={cancelCoupon}
-            />{' '}
-            <p className={styles.couponText}>
-              Cupón {activeCoupon.couponCode} aplicado
-            </p>
-          </div>
-          <Price amount={priceAfterCouponApplied} />
+          <span>
+            🛍️ Precio ({totalCountFromContext} artículo{totalCountFromContext > 1 && 's'})
+          </span>
+          <Price amount={totalAmountFromContext} />
         </div>
-      )}
 
-      <div className={styles.row}>
-        <span>
-          {selectedAddress?.serviceType === SERVICE_TYPES.HOME_DELIVERY 
-            ? `Entrega a domicilio` 
-            : 'Gastos de Envío'
-          }
-        </span>
-        <Price amount={deliveryCost} />
+        {activeCoupon && (
+          <div className={styles.row}>
+            <div className={styles.couponApplied}>
+              <VscChromeClose
+                type='button'
+                className={styles.closeBtn}
+                onClick={cancelCoupon}
+              />{' '}
+              <p className={styles.couponText}>
+                🎫 Cupón {activeCoupon.couponCode} aplicado
+              </p>
+            </div>
+            <Price amount={priceAfterCouponApplied} />
+          </div>
+        )}
+
+        <div className={styles.row}>
+          <span>
+            {selectedAddress?.serviceType === SERVICE_TYPES.HOME_DELIVERY 
+              ? '🚚 Entrega a domicilio' 
+              : '📦 Gastos de Envío'
+            }
+          </span>
+          <Price amount={deliveryCost} />
+        </div>
       </div>
 
       <hr />
 
       <div className={`${styles.row} ${styles.totalPrice}`}>
-        <span>Precio Total</span>
+        <span>💰 Precio Total</span>
         <Price amount={finalPriceToPay} />
       </div>
 
-      <button onClick={handlePlaceOrder} className='btn btn-width-100'>
-        Realizar Pedido por WhatsApp
+      <button 
+        onClick={handlePlaceOrder} 
+        className={`btn btn-width-100 ${styles.orderBtn} ${isProcessing ? styles.processing : ''}`}
+        disabled={isProcessing}
+      >
+        {isProcessing ? (
+          <div className={styles.processingContent}>
+            <span className={styles.spinner}></span>
+            Procesando pedido...
+          </div>
+        ) : (
+          <>
+            <span className={styles.whatsappIcon}>📱</span>
+            Realizar Pedido por WhatsApp
+          </>
+        )}
       </button>
     </article>
   );
