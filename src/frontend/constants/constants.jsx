@@ -41,6 +41,12 @@ export const TEST_USER = {
   password: 'babitaji1234',
 };
 
+// Super administrador
+export const SUPER_ADMIN = {
+  email: 'admin@gadaelectronics.com',
+  password: 'root',
+};
+
 // Usuario alternativo para pruebas
 export const GUEST_USER = {
   email: 'invitado@tienda.com',
@@ -50,11 +56,13 @@ export const GUEST_USER = {
 export const LOCAL_STORAGE_KEYS = {
   User: 'user',
   Token: 'token',
+  StoreConfig: 'storeConfig',
 };
 
 export const LOGIN_CLICK_TYPE = {
   GuestClick: 'guest',
   RegisterClick: 'register',
+  AdminClick: 'admin',
 };
 
 export const INCREMENT_DECRMENT_TYPE = {
@@ -171,3 +179,62 @@ export const MAX_RESPONSES_IN_CACHE_TO_STORE = 50;
 
 // WhatsApp de la tienda
 export const STORE_WHATSAPP = '+53 54690878';
+
+// Configuración por defecto de la tienda
+export const DEFAULT_STORE_CONFIG = {
+  storeName: 'Gada Electronics',
+  whatsappNumber: '+53 54690878',
+  storeAddress: 'Santiago de Cuba, Cuba',
+  lastModified: new Date().toISOString(),
+  version: '1.0.0'
+};
+
+// Códigos de países para validación de WhatsApp
+export const COUNTRY_CODES = [
+  { code: '+1', country: 'Estados Unidos/Canadá', flag: '🇺🇸' },
+  { code: '+7', country: 'Rusia', flag: '🇷🇺' },
+  { code: '+20', country: 'Egipto', flag: '🇪🇬' },
+  { code: '+27', country: 'Sudáfrica', flag: '🇿🇦' },
+  { code: '+30', country: 'Grecia', flag: '🇬🇷' },
+  { code: '+31', country: 'Países Bajos', flag: '🇳🇱' },
+  { code: '+32', country: 'Bélgica', flag: '🇧🇪' },
+  { code: '+33', country: 'Francia', flag: '🇫🇷' },
+  { code: '+34', country: 'España', flag: '🇪🇸' },
+  { code: '+36', country: 'Hungría', flag: '🇭🇺' },
+  { code: '+39', country: 'Italia', flag: '🇮🇹' },
+  { code: '+40', country: 'Rumania', flag: '🇷🇴' },
+  { code: '+41', country: 'Suiza', flag: '🇨🇭' },
+  { code: '+43', country: 'Austria', flag: '🇦🇹' },
+  { code: '+44', country: 'Reino Unido', flag: '🇬🇧' },
+  { code: '+45', country: 'Dinamarca', flag: '🇩🇰' },
+  { code: '+46', country: 'Suecia', flag: '🇸🇪' },
+  { code: '+47', country: 'Noruega', flag: '🇳🇴' },
+  { code: '+48', country: 'Polonia', flag: '🇵🇱' },
+  { code: '+49', country: 'Alemania', flag: '🇩🇪' },
+  { code: '+51', country: 'Perú', flag: '🇵🇪' },
+  { code: '+52', country: 'México', flag: '🇲🇽' },
+  { code: '+53', country: 'Cuba', flag: '🇨🇺' },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+  { code: '+55', country: 'Brasil', flag: '🇧🇷' },
+  { code: '+56', country: 'Chile', flag: '🇨🇱' },
+  { code: '+57', country: 'Colombia', flag: '🇨🇴' },
+  { code: '+58', country: 'Venezuela', flag: '🇻🇪' },
+  { code: '+60', country: 'Malasia', flag: '🇲🇾' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+62', country: 'Indonesia', flag: '🇮🇩' },
+  { code: '+63', country: 'Filipinas', flag: '🇵🇭' },
+  { code: '+64', country: 'Nueva Zelanda', flag: '🇳🇿' },
+  { code: '+65', country: 'Singapur', flag: '🇸🇬' },
+  { code: '+66', country: 'Tailandia', flag: '🇹🇭' },
+  { code: '+81', country: 'Japón', flag: '🇯🇵' },
+  { code: '+82', country: 'Corea del Sur', flag: '🇰🇷' },
+  { code: '+84', country: 'Vietnam', flag: '🇻🇳' },
+  { code: '+86', country: 'China', flag: '🇨🇳' },
+  { code: '+90', country: 'Turquía', flag: '🇹🇷' },
+  { code: '+91', country: 'India', flag: '🇮🇳' },
+  { code: '+92', country: 'Pakistán', flag: '🇵🇰' },
+  { code: '+93', country: 'Afganistán', flag: '🇦🇫' },
+  { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
+  { code: '+95', country: 'Myanmar', flag: '🇲🇲' },
+  { code: '+98', country: 'Irán', flag: '🇮🇷' },
+];

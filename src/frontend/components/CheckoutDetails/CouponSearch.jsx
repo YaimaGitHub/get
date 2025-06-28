@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  COUPONS,
   ToastType,
   DELAY_BETWEEN_BLUR_AND_CLICK,
 } from '../../constants/constants';
@@ -8,6 +7,7 @@ import {
 import styles from './CheckoutDetails.module.css';
 
 import { useAllProductsContext } from '../../contexts/ProductsContextProvider';
+import { useConfigContext } from '../../contexts/ConfigContextProvider';
 import { AiFillTag } from 'react-icons/ai';
 import Price from '../Price';
 import { formatPrice, toastHandler, wait } from '../../utils/utils';
@@ -20,6 +20,9 @@ const CouponSearch = ({ activeCoupon, updateActiveCoupon }) => {
   const {
     cartDetails: { totalAmount: totalAmountFromContext },
   } = useAllProductsContext();
+
+  const { storeConfig } = useConfigContext();
+  const COUPONS = storeConfig.coupons || [];
 
   const isMobile = useIsMobile();
 

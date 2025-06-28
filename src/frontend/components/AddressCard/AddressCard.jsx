@@ -1,5 +1,6 @@
 import { useAllProductsContext } from '../../contexts/ProductsContextProvider';
-import { SERVICE_TYPES, SANTIAGO_ZONES } from '../../constants/constants';
+import { useConfigContext } from '../../contexts/ConfigContextProvider';
+import { SERVICE_TYPES } from '../../constants/constants';
 import styles from './AddressCard.module.css';
 
 const AddressCard = ({
@@ -20,6 +21,9 @@ const AddressCard = ({
 
   const { deleteAddressDispatch, timedMainPageLoader } =
     useAllProductsContext();
+
+  const { storeConfig } = useConfigContext();
+  const SANTIAGO_ZONES = storeConfig.zones || [];
 
   const handleDelete = async () => {
     await timedMainPageLoader();

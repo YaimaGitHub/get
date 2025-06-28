@@ -7,6 +7,7 @@ import {
 } from '../components';
 import {
   TEST_USER,
+  SUPER_ADMIN,
   ToastType,
   LOCAL_STORAGE_KEYS,
   LOGIN_CLICK_TYPE,
@@ -36,15 +37,32 @@ const LoginPage = () => {
     setUserInputs({ ...userInputs, [e.target.name]: e.target.value });
   };
 
-  // used for both the buttons
+  // usado para todos los botones
   const handleSubmit = async (e, clickType) => {
     e.preventDefault();
 
-    const isGuestClick = clickType === LOGIN_CLICK_TYPE.GuestClick;
-    const userInfo = isGuestClick ? TEST_USER : userInputs;
-
-    // Validaciones básicas para login manual
-    if (!isGuestClick) {
+    let userInfo;
+    
+    if (clickType === LOGIN_CLICK_TYPE.GuestClick) {
+      userInfo = TEST_USER;
+    } else if (clickType === LOGIN_CLICK_TYPE.AdminClick) {
+      // Para admin, usar las credenciales del formulario
+      if (!userInputs.email.trim() || !userInputs.password.trim()) {
+        toastHandler(ToastType.Error, 'Por favor ingresa las credenciales de administrador');
+        return;
+      }
+      
+      // Verificar que sean las credenciales correctas del super admin
+      if (userInputs.email !== SUPER_ADMIN.email || userInputs.password !== SUPER_ADMIN.password) {
+        toastHandler(ToastType.Error, 'Credenciales de administrador incorrectas');
+        return;
+      }
+      
+      userInfo = userInputs;
+    } else {
+      userInfo = userInputs;
+      
+      // Validaciones básicas para login manual
       if (!userInputs.email.trim()) {
         toastHandler(ToastType.Error, 'Por favor ingresa tu email');
         return;
@@ -57,7 +75,7 @@ const LoginPage = () => {
 
     setActiveBtnLoader(clickType);
 
-    if (isGuestClick) {
+    if (clickType === LOGIN_CLICK_TYPE.GuestClick) {
       setUserInputs(TEST_USER);
     }
 
@@ -72,10 +90,12 @@ const LoginPage = () => {
       setIntoLocalStorage(LOCAL_STORAGE_KEYS.Token, token);
 
       // show success toast
-      toastHandler(
-        ToastType.Success,
-        `¡Bienvenido ${user.firstName} ${user.lastName}! 😎`
-      );
+      const welcomeMessage = user.email === SUPER_ADMIN.email 
+        ? '¡Bienvenido Super Administrador! 👑'
+        : `¡Bienvenido ${user.firstName} ${user.lastName}! 😎`;
+      
+      toastHandler(ToastType.Success, welcomeMessage);
+      
       // if non-registered user comes from typing '/login' at the url, after success redirect it to '/'
       navigate(locationOfLogin?.state?.from ?? '/');
     } catch (error) {
@@ -136,7 +156,7 @@ const LoginPage = () => {
           )}
         </button>
 
-        {/* this Guest Login button is out of the form  */}
+        {/* Guest Login button */}
         <button
           disabled={!!activeBtnLoader}
           className='btn btn-block'
@@ -147,6 +167,20 @@ const LoginPage = () => {
             <span className='loader-2'></span>
           ) : (
             'Iniciar como Invitado'
+          )}
+        </button>
+
+        {/* Admin Login button */}
+        <button
+          disabled={!!activeBtnLoader}
+          className='btn btn-block btn-danger'
+          type='button'
+          onClick={(e) => handleSubmit(e, LOGIN_CLICK_TYPE.AdminClick)}
+        >
+          {activeBtnLoader === LOGIN_CLICK_TYPE.AdminClick ? (
+            <span className='loader-2'></span>
+          ) : (
+            '👑 Acceso Administrador'
           )}
         </button>
       </form>
@@ -161,6 +195,18 @@ const LoginPage = () => {
             regístrate aquí
           </Link>
         </span>
+      </div>
+
+      <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--grey-50)', borderRadius: 'var(--borderRadius)', fontSize: '0.9rem' }}>
+        <p style={{ margin: '0 0 0.5rem 0', fontWeight: '600', color: 'var(--primary-600)' }}>
+          👑 Credenciales de Administrador:
+        </p>
+        <p style={{ margin: '0 0 0.25rem 0' }}>
+          <strong>Email:</strong> {SUPER_ADMIN.email}
+        </p>
+        <p style={{ margin: '0' }}>
+          <strong>Contraseña:</strong> {SUPER_ADMIN.password}
+        </p>
       </div>
     </LoginAndSignupLayout>
   );

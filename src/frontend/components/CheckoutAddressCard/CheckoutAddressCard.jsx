@@ -1,4 +1,5 @@
-import { SERVICE_TYPES, SANTIAGO_ZONES } from '../../constants/constants';
+import { SERVICE_TYPES } from '../../constants/constants';
+import { useConfigContext } from '../../contexts/ConfigContextProvider';
 import styles from './CheckoutAddressCard.module.css';
 
 const CheckoutAddressCard = ({
@@ -6,6 +7,9 @@ const CheckoutAddressCard = ({
   activeAddressId,
   handleSelect,
 }) => {
+  const { storeConfig } = useConfigContext();
+  const SANTIAGO_ZONES = storeConfig.zones || [];
+  
   const { 
     addressId, 
     username, 

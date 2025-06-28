@@ -10,7 +10,6 @@ import { Footer, Loader, PrivateRoute } from './frontend/components';
 import {
   ErrorPage,
   LoginPage,
-  // Order,
   SignupPage,
 } from './frontend/pages';
 
@@ -32,6 +31,7 @@ const SharedProfileLayout = lazy(() =>
   import('./frontend/pages/SharedProfileLayout/SharedProfileLayout')
 );
 const Checkout = lazy(() => import('./frontend/pages/Checkout/Checkout'));
+const AdminPanel = lazy(() => import('./frontend/pages/AdminPanel/AdminPanel'));
 
 const Fallback = () => {
   return (
@@ -160,7 +160,14 @@ const App = () => {
                   </Suspense>
                 }
               />
-              {/* <Route path='order' element={<Order />} /> */}
+              <Route
+                path='admin'
+                element={
+                  <Suspense fallback={<Fallback />}>
+                    <AdminPanel />
+                  </Suspense>
+                }
+              />
             </Route>
           </Route>
         </Routes>

@@ -8,6 +8,7 @@ import {
   AuthContextProvider,
   FiltersContextProvider,
   ProductsContextProvider,
+  ConfigContextProvider,
 } from './frontend/contexts';
 
 // Call make Server
@@ -18,11 +19,13 @@ const root = createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthContextProvider>
-      <ProductsContextProvider>
-        <FiltersContextProvider>
-          <App />
-        </FiltersContextProvider>
-      </ProductsContextProvider>
+      <ConfigContextProvider>
+        <ProductsContextProvider>
+          <FiltersContextProvider>
+            <App />
+          </FiltersContextProvider>
+        </ProductsContextProvider>
+      </ConfigContextProvider>
     </AuthContextProvider>
   </React.StrictMode>
 );
