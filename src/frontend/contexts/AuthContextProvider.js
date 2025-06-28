@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { getFromLocalStorage, setIntoLocalStorage } from '../utils/utils';
-import { LOCAL_STORAGE_KEYS, SUPER_ADMIN } from '../constants/constants';
+import { LOCAL_STORAGE_KEYS } from '../constants/constants';
 
 const AuthContext = createContext(null);
 
@@ -13,18 +13,10 @@ const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(
     getFromLocalStorage(LOCAL_STORAGE_KEYS.Token)
   );
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const updateUserAuth = ({ user, token }) => {
     setUser(user);
     setToken(token);
-    
-    // Verificar si es super administrador
-    if (user && user.email === SUPER_ADMIN.email) {
-      setIsAdmin(true);
-    } else {
-      setIsAdmin(false);
-    }
   };
 
   useEffect(() => {
@@ -36,16 +28,11 @@ const AuthContextProvider = ({ children }) => {
         cart: [],
         wishlist: [],
       });
-
-      // Verificar si es admin al cargar
-      if (user.email === SUPER_ADMIN.email) {
-        setIsAdmin(true);
-      }
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, isAdmin, updateUserAuth }}>
+    <AuthContext.Provider value={{ user, token, updateUserAuth }}>
       {children}
     </AuthContext.Provider>
   );

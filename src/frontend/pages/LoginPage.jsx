@@ -7,7 +7,6 @@ import {
 } from '../components';
 import {
   TEST_USER,
-  SUPER_ADMIN,
   ToastType,
   LOCAL_STORAGE_KEYS,
   LOGIN_CLICK_TYPE,
@@ -37,20 +36,15 @@ const LoginPage = () => {
     setUserInputs({ ...userInputs, [e.target.name]: e.target.value });
   };
 
-  // usado para todos los botones
+  // used for both the buttons
   const handleSubmit = async (e, clickType) => {
     e.preventDefault();
 
-    let userInfo;
-    
-    if (clickType === LOGIN_CLICK_TYPE.GuestClick) {
-      userInfo = TEST_USER;
-    } else if (clickType === LOGIN_CLICK_TYPE.AdminClick) {
-      userInfo = SUPER_ADMIN;
-    } else {
-      userInfo = userInputs;
-      
-      // Validaciones básicas para login manual
+    const isGuestClick = clickType === LOGIN_CLICK_TYPE.GuestClick;
+    const userInfo = isGuestClick ? TEST_USER : userInputs;
+
+    // Validaciones básicas para login manual
+    if (!isGuestClick) {
       if (!userInputs.email.trim()) {
         toastHandler(ToastType.Error, 'Por favor ingresa tu email');
         return;
@@ -63,10 +57,8 @@ const LoginPage = () => {
 
     setActiveBtnLoader(clickType);
 
-    if (clickType === LOGIN_CLICK_TYPE.GuestClick) {
+    if (isGuestClick) {
       setUserInputs(TEST_USER);
-    } else if (clickType === LOGIN_CLICK_TYPE.AdminClick) {
-      setUserInputs(SUPER_ADMIN);
     }
 
     try {
@@ -80,12 +72,10 @@ const LoginPage = () => {
       setIntoLocalStorage(LOCAL_STORAGE_KEYS.Token, token);
 
       // show success toast
-      const welcomeMessage = user.email === SUPER_ADMIN.email 
-        ? '¡Bienvenido Super Administrador! 👑'
-        : `¡Bienvenido ${user.firstName} ${user.lastName}! 😎`;
-      
-      toastHandler(ToastType.Success, welcomeMessage);
-      
+      toastHandler(
+        ToastType.Success,
+        `¡Bienvenido ${user.firstName} ${user.lastName}! 😎`
+      );
       // if non-registered user comes from typing '/login' at the url, after success redirect it to '/'
       navigate(locationOfLogin?.state?.from ?? '/');
     } catch (error) {
@@ -146,7 +136,7 @@ const LoginPage = () => {
           )}
         </button>
 
-        {/* Guest Login button */}
+        {/* this Guest Login button is out of the form  */}
         <button
           disabled={!!activeBtnLoader}
           className='btn btn-block'
@@ -157,20 +147,6 @@ const LoginPage = () => {
             <span className='loader-2'></span>
           ) : (
             'Iniciar como Invitado'
-          )}
-        </button>
-
-        {/* Admin Login button */}
-        <button
-          disabled={!!activeBtnLoader}
-          className='btn btn-block btn-danger'
-          type='button'
-          onClick={(e) => handleSubmit(e, LOGIN_CLICK_TYPE.AdminClick)}
-        >
-          {activeBtnLoader === LOGIN_CLICK_TYPE.AdminClick ? (
-            <span className='loader-2'></span>
-          ) : (
-            '👑 Acceso Administrador'
           )}
         </button>
       </form>
