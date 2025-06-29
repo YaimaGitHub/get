@@ -5,6 +5,7 @@ import ProductManager from './components/ProductManager';
 import CouponManager from './components/CouponManager';
 import StoreSettings from './components/StoreSettings';
 import ConfigManager from './components/ConfigManager';
+import CategoryManager from './components/CategoryManager';
 import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
@@ -17,6 +18,7 @@ const AdminPanel = () => {
 
   const tabs = [
     { id: 'products', label: '📦 Productos', component: ProductManager },
+    { id: 'categories', label: '📂 Categorías', component: CategoryManager },
     { id: 'coupons', label: '🎫 Cupones', component: CouponManager },
     { id: 'settings', label: '⚙️ Configuración', component: StoreSettings },
     { id: 'config', label: '💾 Exportar/Importar', component: ConfigManager },

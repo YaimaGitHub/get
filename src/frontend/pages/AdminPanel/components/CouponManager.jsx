@@ -33,7 +33,7 @@ const CouponManager = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validaciones
@@ -75,14 +75,12 @@ const CouponManager = () => {
     let updatedCoupons;
     if (editingCoupon) {
       updatedCoupons = coupons.map(c => c.id === editingCoupon.id ? newCoupon : c);
-      toastHandler(ToastType.Success, 'Cupón actualizado exitosamente');
     } else {
       updatedCoupons = [...coupons, newCoupon];
-      toastHandler(ToastType.Success, 'Cupón creado exitosamente');
     }
 
-    // Actualizar en el contexto de configuración
-    updateCoupons(updatedCoupons);
+    // Actualizar en el contexto de configuración (esto guardará en código fuente)
+    await updateCoupons(updatedCoupons);
     setCoupons(updatedCoupons);
     resetForm();
   };
@@ -104,12 +102,11 @@ const CouponManager = () => {
     setShowForm(true);
   };
 
-  const deleteCoupon = (couponId) => {
-    if (window.confirm('¿Estás seguro de eliminar este cupón?')) {
+  const deleteCoupon = async (couponId) => {
+    if (window.confirm('¿Estás seguro de eliminar este cupón? Los cambios se guardarán en el código fuente.')) {
       const updatedCoupons = coupons.filter(c => c.id !== couponId);
-      updateCoupons(updatedCoupons);
+      await updateCoupons(updatedCoupons);
       setCoupons(updatedCoupons);
-      toastHandler(ToastType.Success, 'Cupón eliminado exitosamente');
     }
   };
 
@@ -123,6 +120,11 @@ const CouponManager = () => {
         >
           {showForm ? 'Cancelar' : '+ Nuevo Cupón'}
         </button>
+      </div>
+
+      <div className={styles.warningBox}>
+        <h4>⚠️ Importante</h4>
+        <p>Los cambios realizados aquí se guardarán directamente en el código fuente (constants.jsx), no en el almacenamiento local del navegador.</p>
       </div>
 
       {showForm && (

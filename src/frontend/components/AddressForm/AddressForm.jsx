@@ -1,4 +1,4 @@
-import { SERVICE_TYPES, ToastType } from '../../constants/constants';
+import { SERVICE_TYPES, ToastType, COUNTRY_CODES } from '../../constants/constants';
 import { useConfigContext } from '../../contexts/ConfigContextProvider';
 
 import { useAllProductsContext } from '../../contexts/ProductsContextProvider';
@@ -38,6 +38,71 @@ const AddressForm = ({ isAdding, isEditingAndData = null, closeForm }) => {
     isEditing ? isEditingAndData : defaultState
   );
 
+  const [phoneValidation, setPhoneValidation] = useState({
+    isValid: false,
+    country: null,
+    message: ''
+  });
+
+  const validatePhoneNumber = (number) => {
+    const cleanNumber = number.replace(/[^\d+]/g, '');
+    
+    if (!cleanNumber.startsWith('+') || cleanNumber.length < 10) {
+      return {
+        isValid: false,
+        country: null,
+        message: 'Número inválido'
+      };
+    }
+
+    const country = COUNTRY_CODES.find(country => 
+      cleanNumber.startsWith(country.code)
+    );
+
+    if (!country) {
+      return {
+        isValid: false,
+        country: null,
+        message: 'Código de país no reconocido'
+      };
+    }
+
+    // Validaciones específicas por país
+    const numberWithoutCode = cleanNumber.substring(country.code.length);
+    
+    // Para Cuba (+53)
+    if (country.code === '+53') {
+      if (numberWithoutCode.length === 8) {
+        return {
+          isValid: true,
+          country,
+          message: `Número válido de ${country.country}`
+        };
+      } else {
+        return {
+          isValid: false,
+          country,
+          message: 'Número cubano debe tener 8 dígitos'
+        };
+      }
+    }
+
+    // Validación general para otros países (entre 7 y 15 dígitos)
+    if (numberWithoutCode.length >= 7 && numberWithoutCode.length <= 15) {
+      return {
+        isValid: true,
+        country,
+        message: `Número válido de ${country.country}`
+      };
+    }
+
+    return {
+      isValid: false,
+      country,
+      message: `Número inválido para ${country.country}`
+    };
+  };
+
   const handleInputChange = (e) => {
     const targetEle = e.target;
     const targetEleName = targetEle.name;
@@ -47,6 +112,12 @@ const AddressForm = ({ isAdding, isEditingAndData = null, closeForm }) => {
       elementValue = isNaN(targetEle.valueAsNumber)
         ? ''
         : targetEle.valueAsNumber;
+    }
+
+    // Validación en tiempo real para números de teléfono
+    if (targetEleName === 'mobile' || targetEleName === 'receiverPhone') {
+      const validation = validatePhoneNumber(elementValue);
+      setPhoneValidation(validation);
     }
 
     setInputs({
@@ -69,6 +140,21 @@ const AddressForm = ({ isAdding, isEditingAndData = null, closeForm }) => {
     for (const field of requiredFields) {
       if (!inputs[field] || (typeof inputs[field] === 'string' && !inputs[field].trim())) {
         toastHandler(ToastType.Error, 'Por favor completa todos los campos obligatorios');
+        return;
+      }
+    }
+
+    // Validar números de teléfono
+    const mobileValidation = validatePhoneNumber(inputs.mobile);
+    if (!mobileValidation.isValid) {
+      toastHandler(ToastType.Error, `Número de móvil inválido: ${mobileValidation.message}`);
+      return;
+    }
+
+    if (inputs.serviceType === SERVICE_TYPES.HOME_DELIVERY) {
+      const receiverPhoneValidation = validatePhoneNumber(inputs.receiverPhone);
+      if (!receiverPhoneValidation.isValid) {
+        toastHandler(ToastType.Error, `Teléfono del receptor inválido: ${receiverPhoneValidation.message}`);
         return;
       }
     }
@@ -96,9 +182,53 @@ const AddressForm = ({ isAdding, isEditingAndData = null, closeForm }) => {
 
   const handleReset = () => {
     setInputs(defaultState);
+    setPhoneValidation({ isValid: false, country: null, message: '' });
   };
 
   const isHomeDelivery = inputs.serviceType === SERVICE_TYPES.HOME_DELIVERY;
+
+  const getPhoneValidationForField = (fieldName) => {
+    if (fieldName === 'mobile' || fieldName === 'receiverPhone') {
+      return validatePhoneNumber(inputs[fieldName]);
+    }
+    return { isValid: false, country: null, message: '' };
+  };
+
+  const PhoneInput = ({ fieldName, label, placeholder }) => {
+    const validation = getPhoneValidationForField(fieldName);
+    
+    return (
+      <div className={styles.formGroup}>
+        <label htmlFor={fieldName}>{label}</label>
+        <div className={styles.phoneContainer}>
+          <input
+            type="tel"
+            name={fieldName}
+            id={fieldName}
+            className={`form-input ${styles.phoneInput}`}
+            placeholder={placeholder}
+            value={inputs[fieldName]}
+            onChange={handleInputChange}
+            required
+          />
+          {validation.country && (
+            <div className={styles.countryInfo}>
+              <span className={styles.flag}>{validation.country.flag}</span>
+              <span className={styles.countryCode}>{validation.country.code}</span>
+            </div>
+          )}
+        </div>
+        {inputs[fieldName] && (
+          <div className={`${styles.validationMessage} ${validation.isValid ? styles.valid : styles.invalid}`}>
+            <span className={styles.validationIcon}>
+              {validation.isValid ? '✅' : '❌'}
+            </span>
+            {validation.message}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className={styles.formOverlay}>
@@ -125,14 +255,10 @@ const AddressForm = ({ isAdding, isEditingAndData = null, closeForm }) => {
             handleChange={handleInputChange}
           />
 
-          <FormRow
-            text='Número de Móvil'
-            type='tel'
-            name='mobile'
-            id='mobile'
-            placeholder='Tu número de móvil'
-            value={inputs.mobile}
-            handleChange={handleInputChange}
+          <PhoneInput
+            fieldName="mobile"
+            label="📞 Número de Móvil"
+            placeholder="+53 54690878"
           />
 
           <div className={styles.formGroup}>
@@ -196,14 +322,10 @@ const AddressForm = ({ isAdding, isEditingAndData = null, closeForm }) => {
                 handleChange={handleInputChange}
               />
 
-              <FormRow
-                text='📞 Teléfono'
-                type='tel'
-                name='receiverPhone'
-                id='receiverPhone'
-                placeholder='Teléfono de quien recibe'
-                value={inputs.receiverPhone}
-                handleChange={handleInputChange}
+              <PhoneInput
+                fieldName="receiverPhone"
+                label="📞 Teléfono del receptor"
+                placeholder="+53 54690878"
               />
             </div>
           ) : (

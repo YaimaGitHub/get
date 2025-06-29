@@ -1,4 +1,4 @@
-.couponManager {
+.categoryManager {
   max-width: 100%;
 }
 
@@ -33,7 +33,7 @@
   font-size: 0.9rem;
 }
 
-.couponForm {
+.categoryForm {
   background: var(--grey-50);
   padding: 2rem;
   border-radius: var(--borderRadius);
@@ -59,17 +59,37 @@
   color: var(--grey-700);
 }
 
+.formGroup small {
+  margin: 0.5rem 0 0.25rem 0;
+  color: var(--grey-500);
+  font-size: 0.85rem;
+}
+
+.imagePreview {
+  margin-top: 1rem;
+  max-width: 200px;
+  border-radius: var(--borderRadius);
+  overflow: hidden;
+  border: 2px solid var(--grey-200);
+}
+
+.imagePreview img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
 .formActions {
   display: flex;
   gap: 1rem;
   margin-top: 2rem;
 }
 
-.couponsList {
+.categoriesList {
   margin-top: 3rem;
 }
 
-.couponsList h3 {
+.categoriesList h3 {
   color: var(--primary-600);
   margin-bottom: 1rem;
 }
@@ -81,13 +101,13 @@
   padding: 2rem;
 }
 
-.couponsGrid {
+.categoriesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
-.couponCard {
+.categoryCard {
   background: var(--white);
   border-radius: var(--borderRadius);
   box-shadow: var(--shadow-2);
@@ -96,56 +116,93 @@
   border-left: 4px solid var(--primary-500);
 }
 
-.couponCard:hover {
+.categoryCard:hover {
   box-shadow: var(--shadow-3);
   transform: translateY(-2px);
 }
 
-.couponHeader {
-  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
-  color: var(--white);
-  padding: 1rem;
+.categoryCard.disabled {
+  border-left-color: var(--grey-400);
+  opacity: 0.7;
+}
+
+.categoryImage {
+  height: 150px;
+  position: relative;
+  overflow: hidden;
+}
+
+.categoryImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.disabledOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-}
-
-.couponHeader h4 {
-  margin: 0;
-  font-size: 1.2rem;
+  justify-content: center;
+  color: var(--white);
   font-weight: 700;
+  font-size: 1.1rem;
 }
 
-.discountBadge {
-  background: var(--white);
-  color: var(--primary-600);
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.couponInfo {
+.categoryInfo {
   padding: 1rem;
 }
 
-.couponInfo p {
-  margin: 0.5rem 0;
+.categoryInfo h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-600);
+  text-transform: capitalize;
+  font-size: 1.2rem;
+}
+
+.categoryInfo p {
+  margin: 0 0 1rem 0;
   color: var(--grey-600);
   font-size: 0.9rem;
+  line-height: 1.4;
 }
 
-.couponActions {
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.statusActive {
+  background: var(--green-light);
+  color: var(--green-dark);
+}
+
+.statusDisabled {
+  background: var(--red-light);
+  color: var(--red-dark);
+}
+
+.categoryActions {
   padding: 1rem;
   display: flex;
   gap: 0.5rem;
   border-top: 1px solid var(--grey-200);
+  flex-wrap: wrap;
 }
 
-.couponActions button {
+.categoryActions button {
   flex: 1;
   padding: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  min-width: 80px;
 }
 
 @media screen and (max-width: 768px) {
@@ -163,13 +220,15 @@
     flex-direction: column;
   }
 
-  .couponsGrid {
+  .categoriesGrid {
     grid-template-columns: 1fr;
   }
 
-  .couponHeader {
+  .categoryActions {
     flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
+  }
+
+  .categoryActions button {
+    flex: none;
   }
 }
