@@ -7,6 +7,25 @@
   margin-bottom: 2rem;
 }
 
+.warningBox {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 2px solid #f59e0b;
+  border-radius: var(--borderRadius);
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.warningBox h4 {
+  margin: 0 0 0.5rem 0;
+  color: #92400e;
+}
+
+.warningBox p {
+  margin: 0;
+  color: #92400e;
+  font-size: 0.9rem;
+}
+
 .settingsSection {
   background: var(--white);
   padding: 2rem;

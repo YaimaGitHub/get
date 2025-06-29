@@ -196,18 +196,6 @@ const LoginPage = () => {
           </Link>
         </span>
       </div>
-
-      <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--grey-50)', borderRadius: 'var(--borderRadius)', fontSize: '0.9rem' }}>
-        <p style={{ margin: '0 0 0.5rem 0', fontWeight: '600', color: 'var(--primary-600)' }}>
-          👑 Credenciales de Administrador:
-        </p>
-        <p style={{ margin: '0 0 0.25rem 0' }}>
-          <strong>Email:</strong> {SUPER_ADMIN.email}
-        </p>
-        <p style={{ margin: '0' }}>
-          <strong>Contraseña:</strong> {SUPER_ADMIN.password}
-        </p>
-      </div>
     </LoginAndSignupLayout>
   );
 };

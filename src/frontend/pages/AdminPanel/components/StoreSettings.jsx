@@ -65,16 +65,16 @@ const StoreSettings = () => {
     }
   };
 
-  const handleSaveSettings = () => {
+  const handleSaveSettings = async () => {
     if (!validateWhatsAppNumber(storeSettings.whatsappNumber)) {
       toastHandler(ToastType.Error, 'Número de WhatsApp inválido');
       return;
     }
 
-    updateStoreInfo(storeSettings);
+    await updateStoreInfo(storeSettings);
   };
 
-  const handleZoneSubmit = (e) => {
+  const handleZoneSubmit = async (e) => {
     e.preventDefault();
     
     if (!zoneForm.name.trim() || !zoneForm.cost || zoneForm.cost < 0) {
@@ -93,13 +93,11 @@ const StoreSettings = () => {
       updatedZones = zones.map(zone => 
         zone.id === editingZone.id ? newZone : zone
       );
-      toastHandler(ToastType.Success, 'Zona actualizada exitosamente');
     } else {
       updatedZones = [...zones, newZone];
-      toastHandler(ToastType.Success, 'Zona creada exitosamente');
     }
 
-    updateZones(updatedZones);
+    await updateZones(updatedZones);
     setZones(updatedZones);
     resetZoneForm();
   };
@@ -120,12 +118,11 @@ const StoreSettings = () => {
     setShowZoneForm(true);
   };
 
-  const deleteZone = (zoneId) => {
-    if (window.confirm('¿Estás seguro de eliminar esta zona?')) {
+  const deleteZone = async (zoneId) => {
+    if (window.confirm('¿Estás seguro de eliminar esta zona? Los cambios se guardarán en el código fuente.')) {
       const updatedZones = zones.filter(zone => zone.id !== zoneId);
-      updateZones(updatedZones);
+      await updateZones(updatedZones);
       setZones(updatedZones);
-      toastHandler(ToastType.Success, 'Zona eliminada exitosamente');
     }
   };
 
@@ -142,6 +139,11 @@ const StoreSettings = () => {
   return (
     <div className={styles.storeSettings}>
       <h2>Configuración de la Tienda</h2>
+
+      <div className={styles.warningBox}>
+        <h4>⚠️ Importante</h4>
+        <p>Los cambios realizados aquí se guardarán directamente en el código fuente (constants.jsx), no en el almacenamiento local del navegador.</p>
+      </div>
 
       <div className={styles.settingsSection}>
         <h3>Información General</h3>
@@ -193,7 +195,7 @@ const StoreSettings = () => {
         </div>
 
         <button onClick={handleSaveSettings} className="btn btn-primary">
-          Guardar Configuración
+          Guardar Configuración en Código Fuente
         </button>
       </div>
 

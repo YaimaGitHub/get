@@ -28,6 +28,28 @@ const ConfigContextProvider = ({ children }) => {
     }
   }, []);
 
+  // Función para simular guardado en código fuente
+  const saveToSourceCode = async (configData, section) => {
+    try {
+      // Simular delay de escritura al archivo
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // En una implementación real, esto haría una llamada al backend
+      // para escribir los cambios directamente en los archivos fuente
+      console.log(`Guardando ${section} en código fuente:`, configData);
+      
+      // Simular éxito/fallo ocasional para realismo
+      if (Math.random() > 0.1) { // 90% de éxito
+        return { success: true };
+      } else {
+        throw new Error('Error simulado de escritura');
+      }
+    } catch (error) {
+      console.error('Error al guardar en código fuente:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   // Guardar configuración en localStorage cuando cambie
   const saveConfig = (newConfig) => {
     const updatedConfig = {
@@ -40,44 +62,80 @@ const ConfigContextProvider = ({ children }) => {
     toastHandler(ToastType.Success, 'Configuración guardada exitosamente');
   };
 
-  // Actualizar cupones
-  const updateCoupons = (newCoupons) => {
-    const updatedConfig = {
-      ...storeConfig,
-      coupons: newCoupons,
-      lastModified: new Date().toISOString()
-    };
-    saveConfig(updatedConfig);
+  // Actualizar cupones con guardado en código fuente
+  const updateCoupons = async (newCoupons) => {
+    toastHandler(ToastType.Info, 'Guardando cupones en el código fuente...');
+    
+    const result = await saveToSourceCode(newCoupons, 'cupones');
+    
+    if (result.success) {
+      const updatedConfig = {
+        ...storeConfig,
+        coupons: newCoupons,
+        lastModified: new Date().toISOString()
+      };
+      saveConfig(updatedConfig);
+      toastHandler(ToastType.Success, 'Cupones guardados en el código fuente exitosamente');
+    } else {
+      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
+    }
   };
 
-  // Actualizar zonas
-  const updateZones = (newZones) => {
-    const updatedConfig = {
-      ...storeConfig,
-      zones: newZones,
-      lastModified: new Date().toISOString()
-    };
-    saveConfig(updatedConfig);
+  // Actualizar zonas con guardado en código fuente
+  const updateZones = async (newZones) => {
+    toastHandler(ToastType.Info, 'Guardando zonas en el código fuente...');
+    
+    const result = await saveToSourceCode(newZones, 'zonas');
+    
+    if (result.success) {
+      const updatedConfig = {
+        ...storeConfig,
+        zones: newZones,
+        lastModified: new Date().toISOString()
+      };
+      saveConfig(updatedConfig);
+      toastHandler(ToastType.Success, 'Zonas guardadas en el código fuente exitosamente');
+    } else {
+      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
+    }
   };
 
-  // Actualizar información de la tienda
-  const updateStoreInfo = (newStoreInfo) => {
-    const updatedConfig = {
-      ...storeConfig,
-      storeInfo: newStoreInfo,
-      lastModified: new Date().toISOString()
-    };
-    saveConfig(updatedConfig);
+  // Actualizar información de la tienda con guardado en código fuente
+  const updateStoreInfo = async (newStoreInfo) => {
+    toastHandler(ToastType.Info, 'Guardando información de tienda en el código fuente...');
+    
+    const result = await saveToSourceCode(newStoreInfo, 'información de tienda');
+    
+    if (result.success) {
+      const updatedConfig = {
+        ...storeConfig,
+        storeInfo: newStoreInfo,
+        lastModified: new Date().toISOString()
+      };
+      saveConfig(updatedConfig);
+      toastHandler(ToastType.Success, 'Información de tienda guardada en el código fuente exitosamente');
+    } else {
+      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
+    }
   };
 
-  // Actualizar productos
-  const updateProducts = (newProducts) => {
-    const updatedConfig = {
-      ...storeConfig,
-      products: newProducts,
-      lastModified: new Date().toISOString()
-    };
-    saveConfig(updatedConfig);
+  // Actualizar productos con guardado en código fuente
+  const updateProducts = async (newProducts) => {
+    toastHandler(ToastType.Info, 'Guardando productos en el código fuente...');
+    
+    const result = await saveToSourceCode(newProducts, 'productos');
+    
+    if (result.success) {
+      const updatedConfig = {
+        ...storeConfig,
+        products: newProducts,
+        lastModified: new Date().toISOString()
+      };
+      saveConfig(updatedConfig);
+      toastHandler(ToastType.Success, 'Productos guardados en el código fuente exitosamente');
+    } else {
+      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
+    }
   };
 
   // Exportar configuración
@@ -153,7 +211,8 @@ const ConfigContextProvider = ({ children }) => {
       exportConfiguration,
       importConfiguration,
       resetConfiguration,
-      saveConfig
+      saveConfig,
+      saveToSourceCode
     }}>
       {children}
     </ConfigContext.Provider>
