@@ -5,13 +5,19 @@
     "storeAddressId": "store-main-address"
   },
   "coupons": [],
-  "zones": [],
+  "zones": [
+    {
+      "id": "nuevo_vista_alegre",
+      "name": "Nuevo vista alegre",
+      "cost": 100
+    }
+  ],
   "products": [
     {
       "_id": "9eb0c25b-447c-4723-9ce4-639527debb68",
-      "name": "mi book 156",
-      "price": 31990,
-      "originalPrice": 51999,
+      "name": "mi book 15",
+      "price": 500,
+      "originalPrice": 1000,
       "description": "For this model, screen size is 39.62 cm and hard disk size is 256 GB. CPU Model\tCore is i3. RAM Memory Installed Size is 8 GB. Operating System is Windows 10 Home. Special Feature includes Anti Glare Screen, Light Weight, Thin. Graphics Card is Integrated",
       "category": "laptop",
       "company": "redmi",
@@ -1410,7 +1416,7 @@
       "description": ""
     }
   ],
-  "lastModified": "2025-06-29T09:29:22.659Z",
+  "lastModified": "2025-06-29T09:41:16.299Z",
   "version": "1.0.0",
-  "exportDate": "2025-06-29T09:29:47.854Z"
+  "exportDate": "2025-06-29T09:41:38.903Z"
 }
