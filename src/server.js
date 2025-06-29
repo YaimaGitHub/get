@@ -28,6 +28,7 @@ import {
 import { categories } from './backend/db/categories';
 import { products } from './backend/db/products';
 import { users } from './backend/db/users';
+import configData from '../gada-electronics-config-2025-06-28.json';
 
 export function makeServer({ environment = 'development' } = {}) {
   return new Server({
@@ -91,6 +92,14 @@ export function makeServer({ environment = 'development' } = {}) {
         removeItemFromWishlistHandler.bind(this)
       );
       this.delete('/user/wishlist', removeWishlistHandler.bind(this));
+
+      // Reset namespace to handle config file route
+      this.namespace = '';
+      
+      // Configuration file route (public)
+      this.get('/gada-electronics-config-2025-06-28.json', () => {
+        return configData;
+      });
     },
   });
 }
