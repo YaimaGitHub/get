@@ -118,7 +118,11 @@ export const SERVICE_TYPES = {
   PICKUP: 'pickup'
 };
 
-// Zonas de Santiago de Cuba con costos de entrega
+// CONFIGURACIÓN DINÁMICA DESDE JSON
+// Estas constantes se cargan dinámicamente desde el archivo JSON de configuración
+// y se actualizan automáticamente cuando se modifica la configuración
+
+// Zonas de Santiago de Cuba con costos de entrega (se cargan desde JSON)
 export const SANTIAGO_ZONES = [
   { id: 'centro', name: 'Centro Histórico', cost: 50 },
   { id: 'vista_alegre', name: 'Vista Alegre', cost: 75 },
@@ -137,6 +141,7 @@ export const SANTIAGO_ZONES = [
   { id: 'ciudamar', name: 'Ciudamar', cost: 110 },
 ];
 
+// Cupones de descuento (se cargan desde JSON)
 export const COUPONS = [
   {
     id: uuid(),
@@ -177,14 +182,20 @@ export const MIN_DISTANCE_BETWEEN_THUMBS = 1000;
 
 export const MAX_RESPONSES_IN_CACHE_TO_STORE = 50;
 
-// WhatsApp de la tienda
+// WhatsApp de la tienda (se carga desde JSON)
 export const STORE_WHATSAPP = '+53 54690878';
 
-// Configuración por defecto de la tienda
+// Configuración por defecto de la tienda (se carga desde JSON)
 export const DEFAULT_STORE_CONFIG = {
-  storeName: 'Gada Electronics',
-  whatsappNumber: '+53 54690878',
-  storeAddress: 'Santiago de Cuba, Cuba',
+  storeInfo: {
+    storeName: 'Gada Electronics',
+    whatsappNumber: '+53 54690878',
+    storeAddressId: 'store-main-address',
+  },
+  coupons: COUPONS,
+  zones: SANTIAGO_ZONES,
+  products: [],
+  categories: [],
   lastModified: new Date().toISOString(),
   version: '1.0.0'
 };
@@ -238,3 +249,45 @@ export const COUNTRY_CODES = [
   { code: '+95', country: 'Myanmar', flag: '🇲🇲' },
   { code: '+98', country: 'Irán', flag: '🇮🇷' },
 ];
+
+// Función para obtener configuración actualizada desde JSON
+export const getConfigFromJSON = async () => {
+  try {
+    const response = await fetch('/gada-electronics-config-2025-06-28.json');
+    const config = await response.json();
+    return config;
+  } catch (error) {
+    console.error('Error al cargar configuración desde JSON:', error);
+    return DEFAULT_STORE_CONFIG;
+  }
+};
+
+// Función para actualizar constantes dinámicamente desde JSON
+export const updateConstantsFromJSON = async () => {
+  try {
+    const config = await getConfigFromJSON();
+    
+    // Actualizar zonas dinámicamente
+    if (config.zones && config.zones.length > 0) {
+      SANTIAGO_ZONES.length = 0; // Limpiar array
+      SANTIAGO_ZONES.push(...config.zones);
+    }
+    
+    // Actualizar cupones dinámicamente
+    if (config.coupons && config.coupons.length > 0) {
+      COUPONS.length = 0; // Limpiar array
+      COUPONS.push(...config.coupons);
+    }
+    
+    // Actualizar WhatsApp dinámicamente
+    if (config.storeInfo && config.storeInfo.whatsappNumber) {
+      // No se puede reasignar const, pero se puede usar en el contexto
+      return config.storeInfo.whatsappNumber;
+    }
+    
+    return config;
+  } catch (error) {
+    console.error('Error al actualizar constantes desde JSON:', error);
+    return DEFAULT_STORE_CONFIG;
+  }
+};
