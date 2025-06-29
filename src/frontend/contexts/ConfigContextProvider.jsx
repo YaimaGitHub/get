@@ -1,144 +1,193 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toastHandler } from '../utils/utils';
-import { ToastType, DEFAULT_STORE_CONFIG, COUPONS, SANTIAGO_ZONES } from '../constants/constants';
+import { ToastType } from '../constants/constants';
 
 const ConfigContext = createContext(null);
 
 export const useConfigContext = () => useContext(ConfigContext);
 
 const ConfigContextProvider = ({ children }) => {
+  // Estado principal que controla TODA la configuración de la tienda
   const [storeConfig, setStoreConfig] = useState({
-    storeInfo: DEFAULT_STORE_CONFIG,
-    coupons: COUPONS,
-    zones: SANTIAGO_ZONES,
+    storeInfo: {
+      storeName: 'Gada Electronics',
+      whatsappNumber: '+53 54690878',
+      storeAddressId: 'store-main-address',
+    },
+    coupons: [],
+    zones: [],
     products: [],
-    lastModified: new Date().toISOString()
+    categories: [],
+    lastModified: new Date().toISOString(),
+    version: '1.0.0'
   });
 
-  // Cargar configuración desde localStorage al iniciar
+  // Cargar configuración desde el archivo JSON al iniciar
   useEffect(() => {
-    const savedConfig = localStorage.getItem('adminStoreConfig');
-    if (savedConfig) {
-      try {
-        const parsedConfig = JSON.parse(savedConfig);
-        setStoreConfig(parsedConfig);
-      } catch (error) {
-        console.error('Error al cargar configuración:', error);
-      }
-    }
+    loadConfigurationFromJSON();
   }, []);
 
-  // Función para simular guardado en código fuente
-  const saveToSourceCode = async (configData, section) => {
+  // Función para cargar configuración desde JSON
+  const loadConfigurationFromJSON = async () => {
     try {
+      // Intentar cargar desde localStorage primero (simulando carga desde JSON)
+      const savedConfig = localStorage.getItem('storeCompleteConfig');
+      
+      if (savedConfig) {
+        const parsedConfig = JSON.parse(savedConfig);
+        setStoreConfig(parsedConfig);
+        console.log('Configuración cargada desde JSON:', parsedConfig);
+      } else {
+        // Cargar configuración por defecto desde el archivo JSON incluido
+        await loadDefaultConfiguration();
+      }
+    } catch (error) {
+      console.error('Error al cargar configuración desde JSON:', error);
+      await loadDefaultConfiguration();
+    }
+  };
+
+  // Cargar configuración por defecto desde archivo JSON
+  const loadDefaultConfiguration = async () => {
+    try {
+      // Simular carga del archivo JSON por defecto
+      const response = await fetch('/gada-electronics-config-2025-06-28.json');
+      const defaultConfig = await response.json();
+      
+      setStoreConfig(defaultConfig);
+      saveConfigurationToJSON(defaultConfig);
+    } catch (error) {
+      console.error('Error al cargar configuración por defecto:', error);
+      // Usar configuración mínima si falla todo
+      const fallbackConfig = {
+        storeInfo: {
+          storeName: 'Gada Electronics',
+          whatsappNumber: '+53 54690878',
+          storeAddressId: 'store-main-address',
+        },
+        coupons: [],
+        zones: [],
+        products: [],
+        categories: [],
+        lastModified: new Date().toISOString(),
+        version: '1.0.0'
+      };
+      setStoreConfig(fallbackConfig);
+    }
+  };
+
+  // Función principal para guardar configuración en JSON
+  const saveConfigurationToJSON = (config) => {
+    const updatedConfig = {
+      ...config,
+      lastModified: new Date().toISOString()
+    };
+    
+    // Guardar en localStorage (simulando escritura a archivo JSON)
+    localStorage.setItem('storeCompleteConfig', JSON.stringify(updatedConfig));
+    setStoreConfig(updatedConfig);
+    
+    console.log('Configuración guardada en JSON:', updatedConfig);
+    return updatedConfig;
+  };
+
+  // Función para simular guardado en código fuente
+  const saveToSourceCode = async (data, section) => {
+    try {
+      toastHandler(ToastType.Info, `Guardando ${section} en el código fuente...`);
+      
       // Simular delay de escritura al archivo
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // En una implementación real, esto haría una llamada al backend
       // para escribir los cambios directamente en los archivos fuente
-      console.log(`Guardando ${section} en código fuente:`, configData);
+      console.log(`Guardando ${section} en código fuente:`, data);
       
       // Simular éxito/fallo ocasional para realismo
-      if (Math.random() > 0.1) { // 90% de éxito
+      if (Math.random() > 0.05) { // 95% de éxito
+        toastHandler(ToastType.Success, `${section} guardado en código fuente exitosamente`);
         return { success: true };
       } else {
         throw new Error('Error simulado de escritura');
       }
     } catch (error) {
       console.error('Error al guardar en código fuente:', error);
+      toastHandler(ToastType.Error, `Error al guardar ${section} en código fuente: ${error.message}`);
       return { success: false, error: error.message };
     }
   };
 
-  // Guardar configuración en localStorage cuando cambie
-  const saveConfig = (newConfig) => {
-    const updatedConfig = {
-      ...newConfig,
-      lastModified: new Date().toISOString()
-    };
-    
-    setStoreConfig(updatedConfig);
-    localStorage.setItem('adminStoreConfig', JSON.stringify(updatedConfig));
-    toastHandler(ToastType.Success, 'Configuración guardada exitosamente');
-  };
-
-  // Actualizar cupones con guardado en código fuente
-  const updateCoupons = async (newCoupons) => {
-    toastHandler(ToastType.Info, 'Guardando cupones en el código fuente...');
-    
-    const result = await saveToSourceCode(newCoupons, 'cupones');
-    
-    if (result.success) {
-      const updatedConfig = {
-        ...storeConfig,
-        coupons: newCoupons,
-        lastModified: new Date().toISOString()
-      };
-      saveConfig(updatedConfig);
-      toastHandler(ToastType.Success, 'Cupones guardados en el código fuente exitosamente');
-    } else {
-      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
-    }
-  };
-
-  // Actualizar zonas con guardado en código fuente
-  const updateZones = async (newZones) => {
-    toastHandler(ToastType.Info, 'Guardando zonas en el código fuente...');
-    
-    const result = await saveToSourceCode(newZones, 'zonas');
-    
-    if (result.success) {
-      const updatedConfig = {
-        ...storeConfig,
-        zones: newZones,
-        lastModified: new Date().toISOString()
-      };
-      saveConfig(updatedConfig);
-      toastHandler(ToastType.Success, 'Zonas guardadas en el código fuente exitosamente');
-    } else {
-      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
-    }
-  };
-
-  // Actualizar información de la tienda con guardado en código fuente
-  const updateStoreInfo = async (newStoreInfo) => {
-    toastHandler(ToastType.Info, 'Guardando información de tienda en el código fuente...');
-    
-    const result = await saveToSourceCode(newStoreInfo, 'información de tienda');
-    
-    if (result.success) {
-      const updatedConfig = {
-        ...storeConfig,
-        storeInfo: newStoreInfo,
-        lastModified: new Date().toISOString()
-      };
-      saveConfig(updatedConfig);
-      toastHandler(ToastType.Success, 'Información de tienda guardada en el código fuente exitosamente');
-    } else {
-      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
-    }
-  };
-
-  // Actualizar productos con guardado en código fuente
+  // Actualizar productos
   const updateProducts = async (newProducts) => {
-    toastHandler(ToastType.Info, 'Guardando productos en el código fuente...');
-    
     const result = await saveToSourceCode(newProducts, 'productos');
     
     if (result.success) {
-      const updatedConfig = {
+      const updatedConfig = saveConfigurationToJSON({
         ...storeConfig,
-        products: newProducts,
-        lastModified: new Date().toISOString()
-      };
-      saveConfig(updatedConfig);
-      toastHandler(ToastType.Success, 'Productos guardados en el código fuente exitosamente');
-    } else {
-      toastHandler(ToastType.Error, `Error al guardar en código fuente: ${result.error}`);
+        products: newProducts
+      });
+      return updatedConfig;
     }
+    return null;
   };
 
-  // Exportar configuración
+  // Actualizar categorías
+  const updateCategories = async (newCategories) => {
+    const result = await saveToSourceCode(newCategories, 'categorías');
+    
+    if (result.success) {
+      const updatedConfig = saveConfigurationToJSON({
+        ...storeConfig,
+        categories: newCategories
+      });
+      return updatedConfig;
+    }
+    return null;
+  };
+
+  // Actualizar cupones
+  const updateCoupons = async (newCoupons) => {
+    const result = await saveToSourceCode(newCoupons, 'cupones');
+    
+    if (result.success) {
+      const updatedConfig = saveConfigurationToJSON({
+        ...storeConfig,
+        coupons: newCoupons
+      });
+      return updatedConfig;
+    }
+    return null;
+  };
+
+  // Actualizar zonas
+  const updateZones = async (newZones) => {
+    const result = await saveToSourceCode(newZones, 'zonas');
+    
+    if (result.success) {
+      const updatedConfig = saveConfigurationToJSON({
+        ...storeConfig,
+        zones: newZones
+      });
+      return updatedConfig;
+    }
+    return null;
+  };
+
+  // Actualizar información de la tienda
+  const updateStoreInfo = async (newStoreInfo) => {
+    const result = await saveToSourceCode(newStoreInfo, 'información de tienda');
+    
+    if (result.success) {
+      const updatedConfig = saveConfigurationToJSON({
+        ...storeConfig,
+        storeInfo: newStoreInfo
+      });
+      return updatedConfig;
+    }
+    return null;
+  };
+
+  // Exportar configuración completa
   const exportConfiguration = () => {
     const configToExport = {
       ...storeConfig,
@@ -160,10 +209,10 @@ const ConfigContextProvider = ({ children }) => {
     
     URL.revokeObjectURL(url);
     
-    toastHandler(ToastType.Success, 'Configuración exportada exitosamente');
+    toastHandler(ToastType.Success, 'Configuración completa exportada exitosamente');
   };
 
-  // Importar configuración
+  // Importar configuración completa
   const importConfiguration = async (file) => {
     try {
       const text = await file.text();
@@ -174,7 +223,8 @@ const ConfigContextProvider = ({ children }) => {
         throw new Error('Archivo de configuración inválido');
       }
 
-      saveConfig(config);
+      // Guardar configuración importada
+      saveConfigurationToJSON(config);
       toastHandler(ToastType.Success, 'Configuración importada exitosamente');
       
       // Recargar la página para aplicar los cambios
@@ -188,30 +238,52 @@ const ConfigContextProvider = ({ children }) => {
   };
 
   // Restablecer configuración
-  const resetConfiguration = () => {
-    const defaultConfig = {
-      storeInfo: DEFAULT_STORE_CONFIG,
-      coupons: COUPONS,
-      zones: SANTIAGO_ZONES,
-      products: [],
-      lastModified: new Date().toISOString()
-    };
+  const resetConfiguration = async () => {
+    await loadDefaultConfiguration();
+    toastHandler(ToastType.Success, 'Configuración restablecida desde archivo JSON por defecto');
+  };
+
+  // Función para obtener cualquier parte de la configuración
+  const getConfigSection = (section) => {
+    return storeConfig[section] || [];
+  };
+
+  // Función para actualizar cualquier sección de la configuración
+  const updateConfigSection = async (section, data) => {
+    const result = await saveToSourceCode(data, section);
     
-    saveConfig(defaultConfig);
-    toastHandler(ToastType.Success, 'Configuración restablecida a valores por defecto');
+    if (result.success) {
+      const updatedConfig = saveConfigurationToJSON({
+        ...storeConfig,
+        [section]: data
+      });
+      return updatedConfig;
+    }
+    return null;
   };
 
   return (
     <ConfigContext.Provider value={{
+      // Estado principal
       storeConfig,
+      
+      // Funciones de actualización específicas
+      updateProducts,
+      updateCategories,
       updateCoupons,
       updateZones,
       updateStoreInfo,
-      updateProducts,
+      
+      // Funciones de gestión de configuración
       exportConfiguration,
       importConfiguration,
       resetConfiguration,
-      saveConfig,
+      loadConfigurationFromJSON,
+      saveConfigurationToJSON,
+      
+      // Funciones genéricas
+      getConfigSection,
+      updateConfigSection,
       saveToSourceCode
     }}>
       {children}

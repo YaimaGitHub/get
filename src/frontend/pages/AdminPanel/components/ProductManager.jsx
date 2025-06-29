@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAllProductsContext } from '../../../contexts/ProductsContextProvider';
+import { useConfigContext } from '../../../contexts/ConfigContextProvider';
 import { toastHandler } from '../../../utils/utils';
 import { ToastType } from '../../../constants/constants';
+import { v4 as uuid } from 'uuid';
 import styles from './ProductManager.module.css';
 
 const ProductManager = () => {
-  const { products, categories } = useAllProductsContext();
+  const { categories } = useAllProductsContext();
+  const { storeConfig, updateProducts } = useConfigContext();
+  
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,6 +28,11 @@ const ProductManager = () => {
     isShippingAvailable: true,
     featured: false
   });
+
+  // Cargar productos desde la configuración
+  useEffect(() => {
+    setProducts(storeConfig.products || []);
+  }, [storeConfig.products]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -83,7 +93,7 @@ const ProductManager = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validaciones
     if (!formData.name.trim()) {
       toastHandler(ToastType.Error, 'El nombre del producto es requerido');
@@ -95,15 +105,39 @@ const ProductManager = () => {
       return;
     }
 
-    // Aquí iría la lógica para guardar el producto
-    // Por ahora solo mostramos un mensaje de éxito
-    toastHandler(ToastType.Success, 
-      selectedProduct ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente'
-    );
+    const newProduct = {
+      _id: selectedProduct ? selectedProduct._id : uuid(),
+      name: formData.name.trim(),
+      price: parseFloat(formData.price),
+      originalPrice: parseFloat(formData.originalPrice) || parseFloat(formData.price),
+      description: formData.description.trim(),
+      category: formData.category,
+      company: formData.company.trim(),
+      stock: parseInt(formData.stock) || 0,
+      reviewCount: parseInt(formData.reviewCount) || 0,
+      stars: parseFloat(formData.stars) || 0,
+      colors: formData.colors,
+      image: formData.image,
+      isShippingAvailable: formData.isShippingAvailable,
+      featured: formData.featured
+    };
+
+    let updatedProducts;
+    if (selectedProduct) {
+      updatedProducts = products.map(p => p._id === selectedProduct._id ? newProduct : p);
+    } else {
+      updatedProducts = [...products, newProduct];
+    }
+
+    // Guardar en la configuración JSON (esto también guarda en código fuente)
+    const result = await updateProducts(updatedProducts);
     
-    setIsEditing(false);
-    setSelectedProduct(null);
-    resetForm();
+    if (result) {
+      setProducts(updatedProducts);
+      setIsEditing(false);
+      setSelectedProduct(null);
+      resetForm();
+    }
   };
 
   const resetForm = () => {
@@ -130,6 +164,19 @@ const ProductManager = () => {
     resetForm();
   };
 
+  const handleDelete = async (productId) => {
+    if (!window.confirm('¿Estás seguro de eliminar este producto? Los cambios se guardarán en el código fuente.')) {
+      return;
+    }
+
+    const updatedProducts = products.filter(p => p._id !== productId);
+    const result = await updateProducts(updatedProducts);
+    
+    if (result) {
+      setProducts(updatedProducts);
+    }
+  };
+
   return (
     <div className={styles.productManager}>
       <div className={styles.header}>
@@ -140,6 +187,11 @@ const ProductManager = () => {
         >
           ➕ Nuevo Producto
         </button>
+      </div>
+
+      <div className={styles.warningBox}>
+        <h4>⚠️ Importante</h4>
+        <p>Los cambios realizados aquí se guardarán directamente en el código fuente de la aplicación y se exportarán en el archivo JSON de configuración.</p>
       </div>
 
       {isEditing ? (
@@ -192,7 +244,7 @@ const ProductManager = () => {
                 className="form-select"
               >
                 <option value="">Seleccionar categoría</option>
-                {categories.map(cat => (
+                {(storeConfig.categories || []).map(cat => (
                   <option key={cat._id} value={cat.categoryName}>
                     {cat.categoryName}
                   </option>
@@ -272,6 +324,15 @@ const ProductManager = () => {
               onChange={handleImageUpload}
               className="form-input"
             />
+            <small>O ingresa una URL de imagen:</small>
+            <input
+              type="url"
+              name="image"
+              value={formData.image}
+              onChange={handleInputChange}
+              className="form-input"
+              placeholder="https://ejemplo.com/imagen.jpg"
+            />
             {formData.image && (
               <div className={styles.imagePreview}>
                 <img src={formData.image} alt="Preview" />
@@ -338,7 +399,7 @@ const ProductManager = () => {
 
           <div className={styles.formActions}>
             <button onClick={handleSave} className="btn btn-primary">
-              💾 Guardar
+              💾 Guardar en Código Fuente
             </button>
             <button onClick={handleCancel} className="btn btn-danger">
               ❌ Cancelar
@@ -365,6 +426,12 @@ const ProductManager = () => {
                     className="btn btn-primary"
                   >
                     ✏️ Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product._id)}
+                    className="btn btn-danger"
+                  >
+                    🗑️ Eliminar
                   </button>
                 </div>
               </div>

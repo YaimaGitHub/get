@@ -5,7 +5,6 @@ import {
   deleteFromCartService,
   deleteFromWishlistService,
   deleteWishlistDataService,
-  getAllProductsCategoriesService,
   incDecItemInCartService,
   postAddToCartService,
   postAddToWishlistService,
@@ -15,6 +14,7 @@ import { productsReducer } from '../reducers';
 import { PRODUCTS_ACTION } from '../utils/actions';
 import { ToastType, DELAY_TO_SHOW_LOADER } from '../constants/constants';
 import { useAuthContext } from './AuthContextProvider';
+import { useConfigContext } from './ConfigContextProvider';
 import { initialProductsState } from '../reducers/productsReducer';
 
 const ProductsContext = createContext(null);
@@ -28,6 +28,7 @@ const ProductsContextProvider = ({ children }) => {
   );
 
   const { user, token: tokenFromContext } = useAuthContext();
+  const { storeConfig } = useConfigContext();
 
   // fns
   const showMainPageLoader = () => {
@@ -66,13 +67,15 @@ const ProductsContextProvider = ({ children }) => {
     updateWishlist([]);
   };
 
+  // Cargar productos y categorías desde la configuración JSON
   const fetchAllProductsAndCategories = async () => {
     dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_BEGIN });
-    // as the response was quick, used wait (check utils) to show Loader for 1000s
     await wait(DELAY_TO_SHOW_LOADER);
 
     try {
-      const { products, categories } = await getAllProductsCategoriesService();
+      // Obtener datos desde la configuración JSON
+      const products = storeConfig.products || [];
+      const categories = storeConfig.categories || [];
 
       dispatch({
         type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_FULFILLED,
@@ -80,15 +83,17 @@ const ProductsContextProvider = ({ children }) => {
       });
     } catch (error) {
       dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_REJECTED });
-
       console.error(error);
     }
   };
 
   // useEffects
   useEffect(() => {
-    fetchAllProductsAndCategories();
-  }, []);
+    // Solo cargar si ya tenemos la configuración
+    if (storeConfig && (storeConfig.products || storeConfig.categories)) {
+      fetchAllProductsAndCategories();
+    }
+  }, [storeConfig]);
 
   useEffect(() => {
     if (!user) return;
@@ -265,15 +270,6 @@ const ProductsContextProvider = ({ children }) => {
     });
   };
 
-  // const addOrderDispatch = async (orderObj) => {
-  //   dispatch({
-  //     type: PRODUCTS_ACTION.ADD_ORDER,
-  //     payload: {
-  //       order: orderObj,
-  //     },
-  //   });
-  // };
-
   return (
     <ProductsContext.Provider
       value={{
@@ -295,7 +291,6 @@ const ProductsContextProvider = ({ children }) => {
         editAddressDispatch,
         deleteAddressDispatch,
         deleteAllAddressDispatch,
-        // addOrderDispatch,
         clearCartInContext,
         clearWishlistInContext,
         clearAddressInContext,
