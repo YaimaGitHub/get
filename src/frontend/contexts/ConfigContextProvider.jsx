@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { toastHandler } from '../utils/utils';
 import { ToastType } from '../constants/constants';
 
@@ -22,13 +22,8 @@ const ConfigContextProvider = ({ children }) => {
     version: '1.0.0'
   });
 
-  // Cargar configuración desde el archivo JSON al iniciar
-  useEffect(() => {
-    loadConfigurationFromJSON();
-  }, []);
-
   // Función para cargar configuración desde JSON
-  const loadConfigurationFromJSON = async () => {
+  const loadConfigurationFromJSON = useCallback(async () => {
     try {
       // Intentar cargar desde localStorage primero (simulando carga desde JSON)
       const savedConfig = localStorage.getItem('storeCompleteConfig');
@@ -45,7 +40,12 @@ const ConfigContextProvider = ({ children }) => {
       console.error('Error al cargar configuración desde JSON:', error);
       await loadDefaultConfiguration();
     }
-  };
+  }, []);
+
+  // Cargar configuración desde el archivo JSON al iniciar
+  useEffect(() => {
+    loadConfigurationFromJSON();
+  }, [loadConfigurationFromJSON]);
 
   // Cargar configuración por defecto desde archivo JSON
   const loadDefaultConfiguration = async () => {

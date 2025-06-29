@@ -28,7 +28,21 @@ import {
 import { categories } from './backend/db/categories';
 import { products } from './backend/db/products';
 import { users } from './backend/db/users';
-import configData from '../gada-electronics-config-2025-06-28.json';
+
+// Default configuration data
+const configData = {
+  storeInfo: {
+    storeName: 'Gada Electronics',
+    whatsappNumber: '+53 54690878',
+    storeAddressId: 'store-main-address',
+  },
+  coupons: [],
+  zones: [],
+  products: products,
+  categories: categories,
+  lastModified: new Date().toISOString(),
+  version: '1.0.0'
+};
 
 export function makeServer({ environment = 'development' } = {}) {
   return new Server({

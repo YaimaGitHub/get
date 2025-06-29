@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useReducer } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, useCallback } from 'react';
 import { toastHandler, wait } from '../utils/utils';
 import {
   deleteCartDataService,
@@ -68,7 +68,7 @@ const ProductsContextProvider = ({ children }) => {
   };
 
   // Cargar productos y categorías desde la configuración JSON
-  const fetchAllProductsAndCategories = async () => {
+  const fetchAllProductsAndCategories = useCallback(async () => {
     dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_BEGIN });
     await wait(DELAY_TO_SHOW_LOADER);
 
@@ -85,7 +85,7 @@ const ProductsContextProvider = ({ children }) => {
       dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_REJECTED });
       console.error(error);
     }
-  };
+  }, [storeConfig]);
 
   // useEffects
   useEffect(() => {
@@ -93,7 +93,7 @@ const ProductsContextProvider = ({ children }) => {
     if (storeConfig && (storeConfig.products || storeConfig.categories)) {
       fetchAllProductsAndCategories();
     }
-  }, [storeConfig]);
+  }, [storeConfig, fetchAllProductsAndCategories]);
 
   useEffect(() => {
     if (!user) return;

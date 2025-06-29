@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAllProductsContext } from '../../../contexts/ProductsContextProvider';
 import { useConfigContext } from '../../../contexts/ConfigContextProvider';
 import { toastHandler } from '../../../utils/utils';
 import { ToastType } from '../../../constants/constants';
@@ -7,7 +6,6 @@ import { v4 as uuid } from 'uuid';
 import styles from './ProductManager.module.css';
 
 const ProductManager = () => {
-  const { categories } = useAllProductsContext();
   const { storeConfig, updateProducts } = useConfigContext();
   
   const [products, setProducts] = useState([]);
