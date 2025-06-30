@@ -35,7 +35,7 @@ export const signupService = async (userData) => {
 // Función para cargar configuración desde JSON
 export const loadConfigurationFromJSON = async () => {
   try {
-    const response = await fetch('/gada-electronics-config-2025-06-28.json');
+    const response = await fetch('/gada-electronics-config-2025-06-29.json');
     const config = await response.json();
     return config;
   } catch (error) {

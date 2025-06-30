@@ -253,7 +253,7 @@ export const COUNTRY_CODES = [
 // Función para obtener configuración actualizada desde JSON
 export const getConfigFromJSON = async () => {
   try {
-    const response = await fetch('/gada-electronics-config-2025-06-28.json');
+    const response = await fetch('/gada-electronics-config-2025-06-29.json');
     const config = await response.json();
     return config;
   } catch (error) {
