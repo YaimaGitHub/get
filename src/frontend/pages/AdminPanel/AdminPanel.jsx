@@ -6,6 +6,7 @@ import CouponManager from './components/CouponManager';
 import StoreSettings from './components/StoreSettings';
 import ConfigManager from './components/ConfigManager';
 import CategoryManager from './components/CategoryManager';
+import SourceCodeManager from './components/SourceCodeManager';
 import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
@@ -21,6 +22,7 @@ const AdminPanel = () => {
     { id: 'categories', label: '📂 Categorías', component: CategoryManager },
     { id: 'coupons', label: '🎫 Cupones', component: CouponManager },
     { id: 'settings', label: '⚙️ Configuración', component: StoreSettings },
+    { id: 'sourcecode', label: '📂 Código Fuente', component: SourceCodeManager },
     { id: 'config', label: '💾 Exportar/Importar', component: ConfigManager },
   ];
 
@@ -28,6 +30,11 @@ const AdminPanel = () => {
 
   return (
     <div className={styles.adminPanel}>
+      <div className={styles.header}>
+        <h1>👑 Panel de Control de Administrador</h1>
+        <p>Gestión completa de la tienda basada en archivo JSON</p>
+      </div>
+
       <div className={styles.tabContainer}>
         {tabs.map(tab => (
           <button

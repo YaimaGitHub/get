@@ -28,7 +28,7 @@ const ProductsContextProvider = ({ children }) => {
   );
 
   const { user, token: tokenFromContext } = useAuthContext();
-  const { storeConfig } = useConfigContext();
+  const { storeConfig, configError } = useConfigContext();
 
   // fns
   const showMainPageLoader = () => {
@@ -67,33 +67,60 @@ const ProductsContextProvider = ({ children }) => {
     updateWishlist([]);
   };
 
-  // Cargar productos y categorías desde la configuración JSON
+  // Cargar productos y categorías EXCLUSIVAMENTE desde la configuración JSON
   const fetchAllProductsAndCategories = useCallback(async () => {
     dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_BEGIN });
     await wait(DELAY_TO_SHOW_LOADER);
 
     try {
-      // Obtener datos desde la configuración JSON
+      // CRÍTICO: Solo funciona si hay configuración JSON válida
+      if (!storeConfig || !storeConfig.storeInfo) {
+        throw new Error('No se puede cargar la tienda sin configuración JSON válida');
+      }
+
+      // Obtener datos EXCLUSIVAMENTE desde la configuración JSON
       const products = storeConfig.products || [];
       const categories = storeConfig.categories || [];
+
+      // Validar que hay datos mínimos para que la tienda funcione
+      if (products.length === 0) {
+        console.warn('⚠️ No hay productos en la configuración JSON');
+      }
+
+      if (categories.length === 0) {
+        console.warn('⚠️ No hay categorías en la configuración JSON');
+      }
 
       dispatch({
         type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_FULFILLED,
         payload: { products, categories },
       });
+
+      console.log('✅ Productos y categorías cargados desde JSON:', { 
+        productos: products.length, 
+        categorías: categories.length 
+      });
+
     } catch (error) {
+      console.error('❌ Error crítico al cargar desde JSON:', error);
       dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_REJECTED });
-      console.error(error);
+      
+      // Si falla la carga desde JSON, la tienda NO puede funcionar
+      toastHandler(ToastType.Error, 'Error crítico: La tienda requiere configuración JSON válida');
     }
   }, [storeConfig]);
 
   // useEffects
   useEffect(() => {
-    // Solo cargar si ya tenemos la configuración
-    if (storeConfig && (storeConfig.products || storeConfig.categories)) {
+    // Solo cargar si tenemos configuración JSON válida y sin errores
+    if (storeConfig && storeConfig.storeInfo && !configError) {
       fetchAllProductsAndCategories();
+    } else if (configError) {
+      // Si hay error de configuración, mostrar error y no cargar nada
+      dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_REJECTED });
+      console.error('❌ No se puede cargar la tienda debido a error de configuración JSON');
     }
-  }, [storeConfig, fetchAllProductsAndCategories]);
+  }, [storeConfig, configError, fetchAllProductsAndCategories]);
 
   useEffect(() => {
     if (!user) return;
@@ -102,8 +129,18 @@ const ProductsContextProvider = ({ children }) => {
     updateWishlist(user.wishlist);
   }, [user]);
 
+  // Verificar que la tienda puede funcionar
+  const canStoreOperate = () => {
+    return storeConfig && storeConfig.storeInfo && !configError;
+  };
+
   // fns to get data from services and update state
   const addToCartDispatch = async (productToAdd) => {
+    if (!canStoreOperate()) {
+      toastHandler(ToastType.Error, 'La tienda no puede funcionar sin configuración JSON');
+      return;
+    }
+
     try {
       const cart = await postAddToCartService(productToAdd, tokenFromContext);
       updateCart(cart);
@@ -114,6 +151,11 @@ const ProductsContextProvider = ({ children }) => {
   };
 
   const addToWishlistDispatch = async (productToAdd) => {
+    if (!canStoreOperate()) {
+      toastHandler(ToastType.Error, 'La tienda no puede funcionar sin configuración JSON');
+      return;
+    }
+
     try {
       const wishlist = await postAddToWishlistService(
         productToAdd,
@@ -275,6 +317,7 @@ const ProductsContextProvider = ({ children }) => {
       value={{
         ...productsState,
         isMainPageLoading: productsState.isDataLoading,
+        canStoreOperate,
         showMainPageLoader,
         hideMainPageLoader,
         timedMainPageLoader,
