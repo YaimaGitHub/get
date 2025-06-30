@@ -35,19 +35,16 @@ export const SORT_TYPE = {
 
 export const RATINGS = [4, 3, 2, 1];
 
-// Usuario de prueba predefinido para login como invitado
 export const TEST_USER = {
   email: 'jethalal.gada@gmail.com',
   password: 'babitaji1234',
 };
 
-// Super administrador
 export const SUPER_ADMIN = {
   email: 'admin@gadaelectronics.com',
   password: 'root',
 };
 
-// Usuario alternativo para pruebas
 export const GUEST_USER = {
   email: 'invitado@tienda.com',
   password: '123456',
@@ -79,15 +76,10 @@ export const FILTER_INPUT_TYPE = {
 };
 
 export const DELAY_TO_SHOW_LOADER = 500;
-
 export const DELAY_DEBOUNCED_MS = 250;
-
 export const TOTAL_SKELETONS_LENGTH = 10;
-
 export const DELAY_BETWEEN_BLUR_AND_CLICK = 250;
-
 export const CUSTOM_TOASTID = 1;
-
 export const ITEMS_PER_PAGE = 9;
 
 export const ALL_STATES = [
@@ -112,84 +104,140 @@ export const ALL_STATES = [
   'Región de Murcia',
 ];
 
-// Tipos de servicio
 export const SERVICE_TYPES = {
   HOME_DELIVERY: 'home_delivery',
   PICKUP: 'pickup'
 };
 
-// Zonas de Santiago de Cuba con costos de entrega
+// Zonas de Santiago de Cuba con costos de entrega - ACTUALIZADAS
 export const SANTIAGO_ZONES = [
-  { id: 'centro', name: 'Centro Histórico', cost: 50 },
-  { id: 'vista_alegre', name: 'Vista Alegre', cost: 75 },
-  { id: 'sueno', name: 'Sueño', cost: 60 },
-  { id: 'san_pedrito', name: 'San Pedrito', cost: 80 },
-  { id: 'altamira', name: 'Altamira', cost: 70 },
-  { id: 'reparto_flores', name: 'Reparto Flores', cost: 65 },
-  { id: 'chicharrones', name: 'Chicharrones', cost: 85 },
-  { id: 'los_olmos', name: 'Los Olmos', cost: 90 },
-  { id: 'santa_barbara', name: 'Santa Bárbara', cost: 95 },
-  { id: 'micro_9', name: 'Micro 9', cost: 100 },
-  { id: 'micro_4', name: 'Micro 4', cost: 100 },
-  { id: 'alameda', name: 'Alameda', cost: 55 },
-  { id: 'puerto', name: 'Puerto', cost: 45 },
-  { id: 'siboney', name: 'Siboney', cost: 120 },
-  { id: 'ciudamar', name: 'Ciudamar', cost: 110 },
+  {
+    "id": "centro",
+    "name": "Centro Histórico",
+    "cost": 50
+  },
+  {
+    "id": "vista_alegre",
+    "name": "Vista Alegre",
+    "cost": 75
+  },
+  {
+    "id": "sueno",
+    "name": "Sueño",
+    "cost": 60
+  },
+  {
+    "id": "san_pedrito",
+    "name": "San Pedrito",
+    "cost": 80
+  },
+  {
+    "id": "altamira",
+    "name": "Altamira",
+    "cost": 70
+  },
+  {
+    "id": "reparto_flores",
+    "name": "Reparto Flores",
+    "cost": 65
+  },
+  {
+    "id": "chicharrones",
+    "name": "Chicharrones",
+    "cost": 85
+  },
+  {
+    "id": "los_olmos",
+    "name": "Los Olmos",
+    "cost": 90
+  },
+  {
+    "id": "santa_barbara",
+    "name": "Santa Bárbara",
+    "cost": 95
+  },
+  {
+    "id": "micro_9",
+    "name": "Micro 9",
+    "cost": 100
+  },
+  {
+    "id": "micro_4",
+    "name": "Micro 4",
+    "cost": 100
+  },
+  {
+    "id": "alameda",
+    "name": "Alameda",
+    "cost": 55
+  },
+  {
+    "id": "puerto",
+    "name": "Puerto",
+    "cost": 45
+  },
+  {
+    "id": "siboney",
+    "name": "Siboney",
+    "cost": 120
+  },
+  {
+    "id": "ciudamar",
+    "name": "Ciudamar",
+    "cost": 110
+  }
 ];
 
+// Cupones de descuento - ACTUALIZADOS
 export const COUPONS = [
   {
-    id: uuid(),
-    couponCode: 'DAYA01',
-    text: '30% Descuento',
-    discountPercent: 30,
-    minCartPriceRequired: 150000,
+    "couponCode": "PEPEP",
+    "text": "100% Descuento",
+    "discountPercent": 55,
+    "minCartPriceRequired": 150000,
+    "id": "b6c7a585-79a2-4fde-93cd-80422ef3acfa"
   },
   {
-    id: uuid(),
-    couponCode: 'BABITA02',
-    text: '20% Descuento',
-    discountPercent: 20,
-    minCartPriceRequired: 100000,
+    "couponCode": "PEPE 2",
+    "text": "20% Descuento",
+    "discountPercent": 20,
+    "minCartPriceRequired": 100000,
+    "id": "ecdff7ad-f653-467f-9257-7fcd0fdea3a8"
   },
   {
-    id: uuid(),
-    couponCode: 'TAPU03',
-    text: '10% Descuento',
-    discountPercent: 10,
-    minCartPriceRequired: 50000,
+    "couponCode": "PEPE 3",
+    "text": "10% Descuento",
+    "discountPercent": 10,
+    "minCartPriceRequired": 50000,
+    "id": "4898bd1c-7227-47b0-b6fe-32159f71072b"
   },
   {
-    id: uuid(),
-    couponCode: 'BAPUJI04',
-    text: '5% Descuento',
-    discountPercent: 5,
-    minCartPriceRequired: 20000,
-  },
+    "couponCode": "PEPE 4",
+    "text": "5% Descuento",
+    "discountPercent": 5,
+    "minCartPriceRequired": 20000,
+    "id": "12ee6cb8-1d2d-463d-b9f7-78bcd415c2e4"
+  }
 ];
 
 export const CHARGE_AND_DISCOUNT = {
-  deliveryCharge: 0, // Gratis por defecto
-  discount: 0, // Sin descuento por defecto
+  deliveryCharge: 0,
+  discount: 0,
 };
 
 export const MIN_DISTANCE_BETWEEN_THUMBS = 1000;
-
 export const MAX_RESPONSES_IN_CACHE_TO_STORE = 50;
 
-// WhatsApp de la tienda
+// WhatsApp de la tienda - ACTUALIZADO
 export const STORE_WHATSAPP = '+53 54690878';
 
-// Configuración por defecto de la tienda
+// Configuración por defecto de la tienda - ACTUALIZADA
 export const DEFAULT_STORE_CONFIG = {
-  storeName: 'Gada Electronics',
-  whatsappNumber: '+53 54690878',
-  storeAddress: 'Santiago de Cuba, Cuba',
-  lastModified: new Date().toISOString(),
-  version: '1.0.0'
+  "storeName": "Gada Electronicssss",
+  "whatsappNumber": "+53 54690878",
+  "storeAddressId": "store-main-address"
 };
 
-// Códigos de países para validación de WhatsApp
 export const COUNTRY_CODES = [
   { code: '+1', country: 'Estados Unidos/Canadá', flag: '🇺🇸' },
   { code: '+7', country: 'Rusia', flag: '🇷🇺' },
