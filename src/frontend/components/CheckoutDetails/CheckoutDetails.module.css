@@ -2,156 +2,56 @@
   composes: checkout from '../../pages/CartPage/CartPage.module.css';
   background: linear-gradient(135deg, var(--white), var(--grey-50));
   border: 2px solid var(--primary-200);
-  position: relative;
-  overflow: hidden;
-}
-
-.checkout::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
-  animation: shimmer 3s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
 }
 
 .checkoutHeader {
   background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
   color: var(--white);
-  padding: 1.5rem;
+  padding: 1rem;
   margin: -1.5rem -1.5rem 1.5rem -1.5rem;
   border-radius: var(--borderRadius) var(--borderRadius) 0 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.checkoutHeader::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-  animation: headerShine 4s infinite;
-}
-
-@keyframes headerShine {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
 }
 
 .checkoutHeader h3 {
   margin: 0;
-  font-size: 1.4rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  position: relative;
-  z-index: 1;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .priceBreakdown {
-  background: linear-gradient(135deg, var(--grey-50), var(--white));
-  padding: 1.5rem;
+  background: var(--grey-50);
+  padding: 1rem;
   border-radius: var(--borderRadius);
   margin: 1rem 0;
-  border: 2px solid var(--primary-100);
-  box-shadow: inset 0 2px 4px rgba(59, 130, 246, 0.1);
-  position: relative;
-}
-
-.priceBreakdown::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--primary-300), var(--primary-500), var(--primary-300));
-  border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+  border: 1px solid var(--grey-200);
 }
 
 .row {
   composes: row from '../../pages/CartPage/CartPage.module.css';
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   border-bottom: 1px solid var(--grey-200);
-  transition: var(--transition);
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.row:hover {
-  background: rgba(59, 130, 246, 0.05);
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
 }
 
 .row:last-child {
   border-bottom: none;
-  margin-bottom: 0;
 }
 
 .totalPrice {
   composes: totalPrice from '../../pages/CartPage/CartPage.module.css';
-  background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
-  padding: 1.5rem;
+  background: var(--primary-50);
+  padding: 1rem;
   border-radius: var(--borderRadius);
-  border: 3px solid var(--primary-300);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--primary-700);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.totalPrice::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
-  animation: totalShimmer 2s infinite;
-}
-
-@keyframes totalShimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-.totalPrice span {
-  position: relative;
-  z-index: 1;
+  border: 2px solid var(--primary-200);
+  font-size: 1.1rem;
 }
 
 .orderBtn {
   background: linear-gradient(135deg, #25D366, #128C7E);
   border: none;
   color: var(--white);
-  font-weight: 700;
-  font-size: 1.2rem;
-  padding: 1.25rem 2rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
   border-radius: var(--borderRadius);
   transition: var(--transition);
   position: relative;
@@ -159,45 +59,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-}
-
-.orderBtn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: var(--transition);
+  gap: 0.5rem;
 }
 
 .orderBtn:hover:not(:disabled) {
   background: linear-gradient(135deg, #128C7E, #25D366);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
-}
-
-.orderBtn:hover:not(:disabled)::before {
-  left: 100%;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
 }
 
 .orderBtn:active:not(:disabled) {
-  transform: translateY(-1px);
+  transform: translateY(0);
 }
 
 .orderBtn.processing {
-  background: linear-gradient(135deg, var(--grey-400), var(--grey-500));
+  background: var(--grey-400);
   cursor: not-allowed;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .whatsappIcon {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   animation: bounce 2s infinite;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 @keyframes bounce {
@@ -205,24 +87,24 @@
     transform: translateY(0);
   }
   40% {
-    transform: translateY(-8px);
+    transform: translateY(-5px);
   }
   60% {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
   }
 }
 
 .processingContent {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid var(--white);
-  border-top: 3px solid transparent;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--white);
+  border-top: 2px solid transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -235,14 +117,13 @@
 .searchCoupons {
   display: flex;
   align-items: center;
-  gap: 0 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 0 0.5rem;
+  margin-bottom: 1rem;
   position: relative;
-  background: linear-gradient(135deg, var(--white), var(--grey-50));
-  padding: 1.25rem;
+  background: var(--white);
+  padding: 1rem;
   border-radius: var(--borderRadius);
   border: 2px solid var(--primary-200);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
 }
 
 .searchCoupons > div {
@@ -251,24 +132,22 @@
 }
 
 .searchCoupons svg {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   color: var(--primary-500);
-  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3));
 }
 
 .couponSuggestion {
   position: absolute;
   left: 1rem;
-  top: 3.5rem;
+  top: 2.5rem;
   height: fit-content;
   display: flex;
   flex-direction: column;
-  border: 2px solid var(--primary-200);
+  border: 2px solid var(--grey-100);
   background: var(--white);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-3);
   border-radius: var(--borderRadius);
   z-index: 10;
-  overflow: hidden;
 }
 
 .couponSuggestion > button {
@@ -283,12 +162,11 @@
   border-color: transparent;
   cursor: pointer;
   transition: var(--transition);
-  padding: 0.75rem;
+  padding: 0.35rem;
 }
 
 .couponSuggestion > button:hover {
-  background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
-  color: var(--primary-700);
+  background: var(--primary-100);
 }
 
 .couponSuggestion > button:disabled {
@@ -321,12 +199,10 @@
   color: var(--red-dark);
   cursor: pointer;
   transition: var(--transition);
-  font-size: 1.2rem;
 }
 
 .closeBtn:hover {
-  transform: scale(1.3);
-  color: var(--red-medium);
+  transform: scale(1.2);
 }
 
 @media screen and (min-width: 768px) {
@@ -341,44 +217,36 @@
   }
 
   article.checkout {
-    min-width: 28rem;
+    min-width: 25rem;
   }
   .couponSuggestion > button:hover:not(button:disabled) {
-    background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+    background: var(--primary-100);
   }
 
   .orderBtn {
-    font-size: 1.3rem;
-    padding: 1.5rem 2.5rem;
-  }
-
-  .checkoutHeader h3 {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
+    padding: 1.25rem 2rem;
   }
 }
 
 @media screen and (min-width: 1024px) {
   article.checkout {
-    min-width: 32rem;
+    min-width: 30rem;
   }
 }
 
 .couponSuggestion div {
   border: 2px dashed var(--primary-500);
-  padding: 0.5rem;
-  background: linear-gradient(135deg, var(--primary-50), var(--white));
+  padding: 0.25rem;
 }
 
 .couponApplied {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: var(--primary-600);
-  font-weight: 700;
+  gap: 0.5rem;
+  color: var(--primary-500);
+  font-weight: 600;
   cursor: default;
-  background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
-  padding: 0.5rem;
-  border-radius: 4px;
 }
 
 .couponText {

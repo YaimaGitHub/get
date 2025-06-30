@@ -5,7 +5,7 @@ import { useConfigContext } from '../../../contexts/ConfigContextProvider';
 import styles from './StoreSettings.module.css';
 
 const StoreSettings = () => {
-  const { storeConfig } = useConfigContext();
+  const { storeConfig, updateStoreInfo, updateZones } = useConfigContext();
   const [storeSettings, setStoreSettings] = useState({
     storeName: 'Gada Electronics',
     whatsappNumber: '+53 54690878',
@@ -16,7 +16,6 @@ const StoreSettings = () => {
   const [editingZone, setEditingZone] = useState(null);
   const [showZoneForm, setShowZoneForm] = useState(false);
   const [zoneForm, setZoneForm] = useState({ id: '', name: '', cost: '' });
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Cargar configuración desde el contexto
   useEffect(() => {
@@ -36,7 +35,6 @@ const StoreSettings = () => {
       ...prev,
       [name]: value
     }));
-    setHasUnsavedChanges(true);
   };
 
   const validateWhatsAppNumber = (number) => {
@@ -59,7 +57,6 @@ const StoreSettings = () => {
       ...prev,
       whatsappNumber: number
     }));
-    setHasUnsavedChanges(true);
 
     if (number && !validateWhatsAppNumber(number)) {
       e.target.setCustomValidity('Número de WhatsApp inválido');
@@ -68,17 +65,13 @@ const StoreSettings = () => {
     }
   };
 
-  // GUARDAR CONFIGURACIÓN EN MEMORIA (NO EXPORTAR)
   const handleSaveSettings = () => {
     if (!validateWhatsAppNumber(storeSettings.whatsappNumber)) {
       toastHandler(ToastType.Error, 'Número de WhatsApp inválido');
       return;
     }
 
-    // Solo mostrar mensaje de guardado en memoria
-    toastHandler(ToastType.Success, '✅ Configuración de tienda guardada (cambios en memoria)');
-    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
-    setHasUnsavedChanges(false);
+    updateStoreInfo(storeSettings);
   };
 
   const handleZoneSubmit = (e) => {
@@ -100,15 +93,15 @@ const StoreSettings = () => {
       updatedZones = zones.map(zone => 
         zone.id === editingZone.id ? newZone : zone
       );
-      toastHandler(ToastType.Success, '✅ Zona actualizada (cambios en memoria)');
+      toastHandler(ToastType.Success, 'Zona actualizada exitosamente');
     } else {
       updatedZones = [...zones, newZone];
-      toastHandler(ToastType.Success, '✅ Zona creada (cambios en memoria)');
+      toastHandler(ToastType.Success, 'Zona creada exitosamente');
     }
 
+    updateZones(updatedZones);
     setZones(updatedZones);
     resetZoneForm();
-    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const resetZoneForm = () => {
@@ -128,11 +121,11 @@ const StoreSettings = () => {
   };
 
   const deleteZone = (zoneId) => {
-    if (window.confirm('¿Estás seguro de eliminar esta zona? Los cambios se guardarán en memoria.')) {
+    if (window.confirm('¿Estás seguro de eliminar esta zona?')) {
       const updatedZones = zones.filter(zone => zone.id !== zoneId);
+      updateZones(updatedZones);
       setZones(updatedZones);
-      toastHandler(ToastType.Success, '✅ Zona eliminada (cambios en memoria)');
-      toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
+      toastHandler(ToastType.Success, 'Zona eliminada exitosamente');
     }
   };
 
@@ -146,33 +139,9 @@ const StoreSettings = () => {
 
   const countryInfo = getCountryInfo(storeSettings.whatsappNumber);
 
-  // Verificar si hay cambios pendientes
-  const hasStoreChanges = JSON.stringify(storeSettings) !== JSON.stringify({
-    storeName: storeConfig.storeInfo?.storeName || 'Gada Electronics',
-    whatsappNumber: storeConfig.storeInfo?.whatsappNumber || '+53 54690878',
-    storeAddressId: storeConfig.storeInfo?.storeAddressId || 'store-main-address',
-  });
-
-  const hasZoneChanges = zones.length !== (storeConfig.zones || []).length || 
-    JSON.stringify(zones) !== JSON.stringify(storeConfig.zones || []);
-
-  const hasChanges = hasStoreChanges || hasZoneChanges;
-
   return (
     <div className={styles.storeSettings}>
-      <div className={styles.header}>
-        <h2>Configuración de la Tienda</h2>
-        {hasChanges && (
-          <span className={styles.changesIndicator}>
-            🔴 Cambios pendientes
-          </span>
-        )}
-      </div>
-
-      <div className={styles.infoBox}>
-        <h4>ℹ️ Información Importante</h4>
-        <p>Los cambios se guardan temporalmente en memoria. Para aplicarlos permanentemente, ve a la sección "💾 Exportar/Importar" y exporta la configuración.</p>
-      </div>
+      <h2>Configuración de la Tienda</h2>
 
       <div className={styles.settingsSection}>
         <h3>Información General</h3>
@@ -223,12 +192,8 @@ const StoreSettings = () => {
           )}
         </div>
 
-        <button 
-          onClick={handleSaveSettings} 
-          className="btn btn-primary"
-          disabled={!hasUnsavedChanges}
-        >
-          💾 Guardar Configuración (En Memoria)
+        <button onClick={handleSaveSettings} className="btn btn-primary">
+          Guardar Configuración
         </button>
       </div>
 
@@ -271,7 +236,7 @@ const StoreSettings = () => {
             </div>
             <div className={styles.formActions}>
               <button type="submit" className="btn btn-primary">
-                💾 {editingZone ? 'Actualizar' : 'Crear'} Zona (En Memoria)
+                {editingZone ? 'Actualizar Zona' : 'Crear Zona'}
               </button>
               <button type="button" onClick={resetZoneForm} className="btn btn-hipster">
                 Cancelar

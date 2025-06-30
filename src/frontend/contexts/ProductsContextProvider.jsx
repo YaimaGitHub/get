@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useEffect, useReducer, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useReducer } from 'react';
 import { toastHandler, wait } from '../utils/utils';
 import {
   deleteCartDataService,
   deleteFromCartService,
   deleteFromWishlistService,
   deleteWishlistDataService,
+  getAllProductsCategoriesService,
   incDecItemInCartService,
   postAddToCartService,
   postAddToWishlistService,
@@ -14,7 +15,6 @@ import { productsReducer } from '../reducers';
 import { PRODUCTS_ACTION } from '../utils/actions';
 import { ToastType, DELAY_TO_SHOW_LOADER } from '../constants/constants';
 import { useAuthContext } from './AuthContextProvider';
-import { useConfigContext } from './ConfigContextProvider';
 import { initialProductsState } from '../reducers/productsReducer';
 
 const ProductsContext = createContext(null);
@@ -28,7 +28,6 @@ const ProductsContextProvider = ({ children }) => {
   );
 
   const { user, token: tokenFromContext } = useAuthContext();
-  const { storeConfig, configError } = useConfigContext();
 
   // fns
   const showMainPageLoader = () => {
@@ -67,60 +66,29 @@ const ProductsContextProvider = ({ children }) => {
     updateWishlist([]);
   };
 
-  // Cargar productos y categorías EXCLUSIVAMENTE desde la configuración JSON
-  const fetchAllProductsAndCategories = useCallback(async () => {
+  const fetchAllProductsAndCategories = async () => {
     dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_BEGIN });
+    // as the response was quick, used wait (check utils) to show Loader for 1000s
     await wait(DELAY_TO_SHOW_LOADER);
 
     try {
-      // CRÍTICO: Solo funciona si hay configuración JSON válida
-      if (!storeConfig || !storeConfig.storeInfo) {
-        throw new Error('No se puede cargar la tienda sin configuración JSON válida');
-      }
-
-      // Obtener datos EXCLUSIVAMENTE desde la configuración JSON
-      const products = storeConfig.products || [];
-      const categories = storeConfig.categories || [];
-
-      // Validar que hay datos mínimos para que la tienda funcione
-      if (products.length === 0) {
-        console.warn('⚠️ No hay productos en la configuración JSON');
-      }
-
-      if (categories.length === 0) {
-        console.warn('⚠️ No hay categorías en la configuración JSON');
-      }
+      const { products, categories } = await getAllProductsCategoriesService();
 
       dispatch({
         type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_FULFILLED,
         payload: { products, categories },
       });
-
-      console.log('✅ Productos y categorías cargados desde JSON:', { 
-        productos: products.length, 
-        categorías: categories.length 
-      });
-
     } catch (error) {
-      console.error('❌ Error crítico al cargar desde JSON:', error);
       dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_REJECTED });
-      
-      // Si falla la carga desde JSON, la tienda NO puede funcionar
-      toastHandler(ToastType.Error, 'Error crítico: La tienda requiere configuración JSON válida');
+
+      console.error(error);
     }
-  }, [storeConfig]);
+  };
 
   // useEffects
   useEffect(() => {
-    // Solo cargar si tenemos configuración JSON válida y sin errores
-    if (storeConfig && storeConfig.storeInfo && !configError) {
-      fetchAllProductsAndCategories();
-    } else if (configError) {
-      // Si hay error de configuración, mostrar error y no cargar nada
-      dispatch({ type: PRODUCTS_ACTION.GET_ALL_PRODUCTS_REJECTED });
-      console.error('❌ No se puede cargar la tienda debido a error de configuración JSON');
-    }
-  }, [storeConfig, configError, fetchAllProductsAndCategories]);
+    fetchAllProductsAndCategories();
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -129,18 +97,8 @@ const ProductsContextProvider = ({ children }) => {
     updateWishlist(user.wishlist);
   }, [user]);
 
-  // Verificar que la tienda puede funcionar
-  const canStoreOperate = () => {
-    return storeConfig && storeConfig.storeInfo && !configError;
-  };
-
   // fns to get data from services and update state
   const addToCartDispatch = async (productToAdd) => {
-    if (!canStoreOperate()) {
-      toastHandler(ToastType.Error, 'La tienda no puede funcionar sin configuración JSON');
-      return;
-    }
-
     try {
       const cart = await postAddToCartService(productToAdd, tokenFromContext);
       updateCart(cart);
@@ -151,11 +109,6 @@ const ProductsContextProvider = ({ children }) => {
   };
 
   const addToWishlistDispatch = async (productToAdd) => {
-    if (!canStoreOperate()) {
-      toastHandler(ToastType.Error, 'La tienda no puede funcionar sin configuración JSON');
-      return;
-    }
-
     try {
       const wishlist = await postAddToWishlistService(
         productToAdd,
@@ -312,12 +265,20 @@ const ProductsContextProvider = ({ children }) => {
     });
   };
 
+  // const addOrderDispatch = async (orderObj) => {
+  //   dispatch({
+  //     type: PRODUCTS_ACTION.ADD_ORDER,
+  //     payload: {
+  //       order: orderObj,
+  //     },
+  //   });
+  // };
+
   return (
     <ProductsContext.Provider
       value={{
         ...productsState,
         isMainPageLoading: productsState.isDataLoading,
-        canStoreOperate,
         showMainPageLoader,
         hideMainPageLoader,
         timedMainPageLoader,
@@ -334,6 +295,7 @@ const ProductsContextProvider = ({ children }) => {
         editAddressDispatch,
         deleteAddressDispatch,
         deleteAllAddressDispatch,
+        // addOrderDispatch,
         clearCartInContext,
         clearWishlistInContext,
         clearAddressInContext,
