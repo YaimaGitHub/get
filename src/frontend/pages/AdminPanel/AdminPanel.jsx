@@ -7,6 +7,7 @@ import StoreSettings from './components/StoreSettings';
 import ConfigManager from './components/ConfigManager';
 import CategoryManager from './components/CategoryManager';
 import MessagesManager from './components/MessagesManager';
+import BackupManager from './components/BackupManager';
 import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
@@ -24,6 +25,7 @@ const AdminPanel = () => {
     { id: 'coupons', label: '🎫 Cupones', component: CouponManager },
     { id: 'settings', label: '⚙️ Configuración', component: StoreSettings },
     { id: 'config', label: '💾 Exportar/Importar', component: ConfigManager },
+    { id: 'backup', label: '🗂️ Sistema Backup', component: BackupManager },
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
