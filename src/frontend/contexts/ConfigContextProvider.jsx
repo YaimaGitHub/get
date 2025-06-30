@@ -51,7 +51,7 @@ const ConfigContextProvider = ({ children }) => {
   const loadDefaultConfiguration = async () => {
     try {
       // Simular carga del archivo JSON por defecto
-      const response = await fetch('/gada-electronics-config-2025-06-28.json');
+      const response = await fetch('/gada-electronics-config-2025-06-29.json');
       const defaultConfig = await response.json();
       
       setStoreConfig(defaultConfig);

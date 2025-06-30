@@ -32,6 +32,34 @@ export const signupService = async (userData) => {
   }
 };
 
+// Función para cargar configuración desde JSON
+export const loadConfigurationFromJSON = async () => {
+  try {
+    const response = await fetch('/gada-electronics-config-2025-06-29.json');
+    const config = await response.json();
+    return config;
+  } catch (error) {
+    console.error('Error al cargar configuración desde JSON:', error);
+    throw error;
+  }
+};
+
+// Función para obtener productos y categorías desde la configuración JSON
+export const getAllProductsCategoriesFromConfig = async () => {
+  try {
+    const config = await loadConfigurationFromJSON();
+    return {
+      products: config.products || [],
+      categories: config.categories || []
+    };
+  } catch (error) {
+    console.error('Error al obtener productos y categorías desde configuración:', error);
+    // Fallback a la API original si falla la configuración JSON
+    return getAllProductsCategoriesService();
+  }
+};
+
+// Función original mantenida como fallback
 export const getAllProductsCategoriesService = async () => {
   const productsPromise = axios.get('/api/products');
   const categoriesPromise = axios.get('/api/categories');
@@ -40,7 +68,7 @@ export const getAllProductsCategoriesService = async () => {
     productsPromise,
     categoriesPromise,
   ]);
-  // as this is Promise.all, any one the two promise fails, throws error, and control goes to catch!!
+  
   const { products } = productsResponse.data;
   const { categories } = categoriesResponse.data;
 
@@ -54,32 +82,31 @@ export const getProductsOnSearch = async ({ query }) => {
 };
 
 export const getSingleProductService = async (productID) => {
-  const {
-    status,
-    data: { product },
-  } = await axios.get(`/api/products/${productID}`);
-
-  // if user types - 'localhost/products/xyz', using useParams, I am getting productID and passing it to 'this service'.
-  // then this proudctID is used to 'get' the data from backend.
-  // but in the backend, no product with such '_id' (i.e. xyz) exists.
-  // so backend returns null.
-  /*
-  {
-    status: 200,
-    data: {
-      product: null;
+  try {
+    // Primero intentar obtener desde la configuración JSON
+    const config = await loadConfigurationFromJSON();
+    const product = config.products?.find(p => p._id === productID);
+    
+    if (product) {
+      return product;
     }
-  }
-  */
+    
+    // Fallback a la API original
+    const {
+      status,
+      data: { product: apiProduct },
+    } = await axios.get(`/api/products/${productID}`);
 
-  // to handle that thrown a error, which will give control to catch block and error state becomes true and will show error on screen.
+    if (!apiProduct) {
+      throw new Error('Error: Product not found!');
+    }
 
-  if (!product) {
-    throw new Error('Error: Product not found!');
-  }
-
-  if (status === 200 || status === 201) {
-    return product;
+    if (status === 200 || status === 201) {
+      return apiProduct;
+    }
+  } catch (error) {
+    console.error('Error al obtener producto:', error);
+    throw error;
   }
 };
 

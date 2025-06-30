@@ -1,8 +1,16 @@
 /**
- * Category Database can be added here.
- * You can add category of your wish with different attributes
- * */
+ * Category Database - CONFIGURACIÓN DINÁMICA DESDE JSON
+ * 
+ * IMPORTANTE: Esta base de datos se carga dinámicamente desde el archivo JSON de configuración.
+ * Las categorías aquí definidas son solo un fallback en caso de que falle la carga desde JSON.
+ * 
+ * La configuración real de categorías se obtiene desde:
+ * - Archivo JSON de configuración exportado/importado
+ * - Panel de administración que modifica el JSON
+ * - Sistema de configuración centralizado
+ */
 
+// Categorías de fallback (se usan solo si falla la carga desde JSON)
 export const categories = [
   {
     _id: '35abdf47-0dae-40fc-b201-a981e9daa3d4',
@@ -40,3 +48,51 @@ export const categories = [
     description: '',
   },
 ];
+
+/**
+ * Función para cargar categorías desde configuración JSON
+ * Esta función se usa en lugar de la exportación directa
+ */
+export const loadCategoriesFromConfig = async () => {
+  try {
+    const response = await fetch('/gada-electronics-config-2025-06-28.json');
+    const config = await response.json();
+    
+    if (config.categories && config.categories.length > 0) {
+      console.log('Categorías cargadas desde configuración JSON:', config.categories.length);
+      return config.categories;
+    }
+    
+    console.log('Usando categorías de fallback');
+    return categories;
+  } catch (error) {
+    console.error('Error al cargar categorías desde JSON, usando fallback:', error);
+    return categories;
+  }
+};
+
+/**
+ * Función para obtener una categoría específica desde configuración JSON
+ */
+export const getCategoryFromConfig = async (categoryId) => {
+  try {
+    const configCategories = await loadCategoriesFromConfig();
+    return configCategories.find(category => category._id === categoryId);
+  } catch (error) {
+    console.error('Error al obtener categoría desde configuración:', error);
+    return categories.find(category => category._id === categoryId);
+  }
+};
+
+/**
+ * Función para obtener categorías activas (no deshabilitadas)
+ */
+export const getActiveCategoriesFromConfig = async () => {
+  try {
+    const configCategories = await loadCategoriesFromConfig();
+    return configCategories.filter(category => !category.disabled);
+  } catch (error) {
+    console.error('Error al obtener categorías activas:', error);
+    return categories;
+  }
+};
