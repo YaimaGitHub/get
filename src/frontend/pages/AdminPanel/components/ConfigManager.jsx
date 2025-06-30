@@ -11,17 +11,23 @@ const ConfigManager = () => {
     importConfiguration, 
     resetConfiguration,
     isLoading,
-    configError
+    configError,
+    hasPendingChanges
   } = useConfigContext();
   
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const handleExport = async () => {
+    if (!hasPendingChanges()) {
+      toastHandler(ToastType.Info, 'No hay cambios pendientes para exportar');
+      return;
+    }
+
     setIsExporting(true);
     
     try {
-      toastHandler(ToastType.Info, 'Preparando exportación completa...');
+      toastHandler(ToastType.Info, 'Exportando configuración completa al archivo JSON...');
       await exportConfiguration();
     } catch (error) {
       toastHandler(ToastType.Error, 'Error al exportar la configuración');
@@ -43,7 +49,7 @@ const ConfigManager = () => {
     setIsImporting(true);
 
     try {
-      toastHandler(ToastType.Info, 'Importando configuración...');
+      toastHandler(ToastType.Info, 'Importando configuración desde archivo JSON...');
       await importConfiguration(file);
     } catch (error) {
       toastHandler(ToastType.Error, 'Error al importar la configuración');
@@ -59,7 +65,7 @@ const ConfigManager = () => {
     }
 
     try {
-      toastHandler(ToastType.Info, 'Restableciendo configuración...');
+      toastHandler(ToastType.Info, 'Restableciendo configuración desde JSON original...');
       await resetConfiguration();
     } catch (error) {
       toastHandler(ToastType.Error, 'Error al restablecer la configuración');
@@ -73,12 +79,19 @@ const ConfigManager = () => {
 
   return (
     <div className={styles.configManager}>
-      <h2>💾 Gestión de Configuración JSON</h2>
+      <h2>💾 Exportar/Importar Configuración JSON</h2>
       
       {configError && (
         <div className={styles.errorAlert}>
           <h4>⚠️ Error de Configuración</h4>
           <p>{configError}</p>
+        </div>
+      )}
+
+      {hasPendingChanges() && (
+        <div className={styles.pendingChangesAlert}>
+          <h4>🔴 Cambios Pendientes Detectados</h4>
+          <p>Hay modificaciones en el panel de control que no se han aplicado a la tienda. Exporta la configuración para aplicar todos los cambios.</p>
         </div>
       )}
       
@@ -103,18 +116,19 @@ const ConfigManager = () => {
               <span className={styles.statLabel}>Zonas</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statNumber}>{storeConfig.sourceCode?.totalFiles || 0}</span>
-              <span className={styles.statLabel}>Archivos Código</span>
-            </div>
-            <div className={styles.statItem}>
               <span className={styles.statNumber}>{getConfigSize()}</span>
               <span className={styles.statLabel}>KB Total</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.statNumber}>{hasPendingChanges() ? '🔴' : '✅'}</span>
+              <span className={styles.statLabel}>Estado</span>
             </div>
           </div>
           <div className={styles.configInfo}>
             <p><strong>📅 Última modificación:</strong> {new Date(storeConfig.lastModified).toLocaleString('es-CU')}</p>
             <p><strong>🔢 Versión:</strong> {storeConfig.version}</p>
             <p><strong>🏪 Tienda:</strong> {storeConfig.storeInfo?.storeName}</p>
+            <p><strong>📊 Cambios pendientes:</strong> {hasPendingChanges() ? 'SÍ - Requiere exportación' : 'NO - Todo aplicado'}</p>
           </div>
         </div>
       </div>
@@ -122,37 +136,38 @@ const ConfigManager = () => {
       <div className={styles.configSection}>
         <div className={styles.configCard}>
           <div className={styles.cardHeader}>
-            <h3>📤 Exportar Configuración Completa</h3>
+            <h3>📤 Exportar Configuración al Archivo JSON</h3>
           </div>
           <div className={styles.cardContent}>
             <p>
-              Exporta TODA la configuración de la tienda en un archivo JSON que incluye:
+              Exporta TODOS los cambios realizados en el panel de control al archivo JSON de la tienda:
             </p>
             <ul className={styles.featureList}>
-              <li>✅ Todos los productos con detalles completos</li>
-              <li>✅ Todas las categorías y subcategorías</li>
-              <li>✅ Todos los cupones de descuento</li>
-              <li>✅ Todas las zonas de entrega con costos</li>
-              <li>✅ Configuración completa de la tienda</li>
+              <li>✅ Todos los productos modificados/creados/eliminados</li>
+              <li>✅ Todas las categorías modificadas/creadas/eliminadas</li>
+              <li>✅ Todos los cupones modificados/creados/eliminados</li>
+              <li>✅ Todas las zonas modificadas/creadas/eliminadas</li>
+              <li>✅ Configuración de tienda actualizada</li>
               <li>✅ Información de contacto y WhatsApp</li>
-              <li>✅ Todo el código fuente escaneado</li>
-              <li>✅ Metadatos y versiones</li>
+              <li>✅ Metadatos y versiones actualizadas</li>
             </ul>
-            <div className={styles.warningBox}>
-              <p><strong>⚠️ Importante:</strong> Este archivo JSON es la base de datos completa de tu tienda. Guárdalo en un lugar seguro.</p>
+            <div className={styles.criticalInfo}>
+              <p><strong>🎯 IMPORTANTE:</strong> Este proceso aplicará TODOS los cambios pendientes a la tienda y generará el archivo JSON actualizado.</p>
             </div>
             <button 
               onClick={handleExport}
-              disabled={isExporting || isLoading}
-              className={`btn btn-primary ${styles.actionButton}`}
+              disabled={isExporting || isLoading || !hasPendingChanges()}
+              className={`btn ${hasPendingChanges() ? 'btn-primary' : 'btn-hipster'} ${styles.actionButton}`}
             >
               {isExporting ? (
                 <span className={styles.loading}>
                   <span className="loader-2"></span>
                   Exportando...
                 </span>
+              ) : hasPendingChanges() ? (
+                '📤 Exportar Cambios al Archivo JSON'
               ) : (
-                '📤 Exportar Configuración JSON'
+                '✅ No hay cambios para exportar'
               )}
             </button>
           </div>
@@ -160,7 +175,7 @@ const ConfigManager = () => {
 
         <div className={styles.configCard}>
           <div className={styles.cardHeader}>
-            <h3>📥 Importar Configuración JSON</h3>
+            <h3>📥 Importar Configuración desde JSON</h3>
           </div>
           <div className={styles.cardContent}>
             <p>
@@ -206,7 +221,7 @@ const ConfigManager = () => {
             </p>
             <div className={styles.criticalWarning}>
               <h4>🚨 ADVERTENCIA</h4>
-              <p>Esta acción eliminará todos los cambios no guardados y recargará desde el archivo JSON base.</p>
+              <p>Esta acción eliminará todos los cambios no exportados y recargará desde el archivo JSON base.</p>
             </div>
             <button 
               onClick={handleReset}
@@ -226,25 +241,19 @@ const ConfigManager = () => {
             <strong>🎯 Funcionamiento:</strong> La tienda depende 100% del archivo JSON para funcionar
           </div>
           <div className={styles.infoItem}>
-            <strong>💾 Persistencia:</strong> Todos los cambios se guardan directamente en el archivo JSON
+            <strong>💾 Guardado:</strong> Los cambios se guardan en memoria hasta la exportación
           </div>
           <div className={styles.infoItem}>
-            <strong>📁 Formato:</strong> JSON estructurado con validación estricta
+            <strong>📁 Exportación:</strong> Solo se exporta cuando hay cambios pendientes
           </div>
           <div className={styles.infoItem}>
-            <strong>🔄 Tiempo Real:</strong> Los cambios se aplican inmediatamente al guardar
+            <strong>🔄 Aplicación:</strong> Los cambios se aplican al exportar al archivo JSON
           </div>
           <div className={styles.infoItem}>
             <strong>🛡️ Seguridad:</strong> Sin dependencia del localStorage del navegador
           </div>
           <div className={styles.infoItem}>
-            <strong>⚡ Rendimiento:</strong> Carga optimizada y validación automática
-          </div>
-          <div className={styles.infoItem}>
-            <strong>🔍 Código Fuente:</strong> Incluye escaneo completo del código de la aplicación
-          </div>
-          <div className={styles.infoItem}>
-            <strong>📊 Metadatos:</strong> Información completa sobre versiones y modificaciones
+            <strong>⚡ Tiempo Real:</strong> Los cambios se aplican inmediatamente al exportar
           </div>
         </div>
       </div>
@@ -256,13 +265,13 @@ const ConfigManager = () => {
             <strong>Archivo de configuración:</strong> gada-electronics-config-[fecha].json
           </div>
           <div className={styles.techItem}>
-            <strong>Estructura JSON:</strong> Validada automáticamente al cargar
+            <strong>Proceso de exportación:</strong> Memoria → Servidor → Archivo JSON → Recarga
           </div>
           <div className={styles.techItem}>
-            <strong>Backup automático:</strong> Se genera al exportar con timestamp
+            <strong>Validación:</strong> Estructura JSON validada automáticamente
           </div>
           <div className={styles.techItem}>
-            <strong>Compatibilidad:</strong> Funciona en todos los navegadores modernos
+            <strong>Backup:</strong> Se genera automáticamente al exportar
           </div>
         </div>
       </div>
