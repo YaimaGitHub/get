@@ -9,27 +9,49 @@
   margin-bottom: 2rem;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .header h2 {
   margin: 0;
   color: var(--primary-600);
 }
 
-.warningBox {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border: 2px solid #f59e0b;
+.changesIndicator {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid #f87171;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.infoBox {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border: 2px solid #3b82f6;
   border-radius: var(--borderRadius);
   padding: 1rem;
   margin-bottom: 2rem;
 }
 
-.warningBox h4 {
+.infoBox h4 {
   margin: 0 0 0.5rem 0;
-  color: #92400e;
+  color: #1e40af;
 }
 
-.warningBox p {
+.infoBox p {
   margin: 0;
-  color: #92400e;
+  color: #1e40af;
   font-size: 0.9rem;
 }
 
@@ -39,6 +61,30 @@
   border-radius: var(--borderRadius);
   margin-bottom: 2rem;
   border: 2px solid var(--primary-200);
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--primary-200);
+}
+
+.formHeader h3 {
+  margin: 0;
+  color: var(--primary-600);
+}
+
+.unsavedIndicator {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #f59e0b;
 }
 
 .formGrid {
@@ -89,9 +135,36 @@
   margin-top: 3rem;
 }
 
-.categoriesList h3 {
-  color: var(--primary-600);
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 1rem;
+}
+
+.listHeader h3 {
+  color: var(--primary-600);
+  margin: 0;
+}
+
+.changesAlert {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border: 2px solid #f87171;
+  border-radius: var(--borderRadius);
+  padding: 1rem;
+  text-align: center;
+}
+
+.changesAlert span {
+  display: block;
+  color: #dc2626;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.changesAlert small {
+  color: #991b1b;
+  font-size: 0.8rem;
 }
 
 .emptyMessage {
@@ -212,6 +285,10 @@
     align-items: stretch;
   }
 
+  .headerActions {
+    flex-direction: column;
+  }
+
   .formGrid {
     grid-template-columns: 1fr;
   }
@@ -230,5 +307,10 @@
 
   .categoryActions button {
     flex: none;
+  }
+
+  .listHeader {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
