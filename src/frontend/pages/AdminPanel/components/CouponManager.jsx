@@ -6,10 +6,11 @@ import { useConfigContext } from '../../../contexts/ConfigContextProvider';
 import styles from './CouponManager.module.css';
 
 const CouponManager = () => {
-  const { storeConfig, updateCoupons } = useConfigContext();
+  const { storeConfig } = useConfigContext();
   const [coupons, setCoupons] = useState([]);
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const initialCouponState = {
     couponCode: '',
@@ -31,9 +32,11 @@ const CouponManager = () => {
       ...prev,
       [name]: value
     }));
+    setHasUnsavedChanges(true);
   };
 
-  const handleSubmit = async (e) => {
+  // GUARDAR CAMBIOS EN MEMORIA LOCAL (NO EXPORTAR)
+  const handleSubmit = (e) => {
     e.preventDefault();
     
     // Validaciones
@@ -75,20 +78,25 @@ const CouponManager = () => {
     let updatedCoupons;
     if (editingCoupon) {
       updatedCoupons = coupons.map(c => c.id === editingCoupon.id ? newCoupon : c);
+      toastHandler(ToastType.Success, '✅ Cupón actualizado (cambios en memoria)');
     } else {
       updatedCoupons = [...coupons, newCoupon];
+      toastHandler(ToastType.Success, '✅ Cupón creado (cambios en memoria)');
     }
 
-    // Actualizar en el contexto de configuración (esto guardará en código fuente)
-    await updateCoupons(updatedCoupons);
+    // SOLO GUARDAR EN MEMORIA LOCAL - NO EXPORTAR
     setCoupons(updatedCoupons);
     resetForm();
+
+    // Mostrar mensaje informativo
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const resetForm = () => {
     setCouponForm(initialCouponState);
     setEditingCoupon(null);
     setShowForm(false);
+    setHasUnsavedChanges(false);
   };
 
   const editCoupon = (coupon) => {
@@ -100,35 +108,66 @@ const CouponManager = () => {
     });
     setEditingCoupon(coupon);
     setShowForm(true);
+    setHasUnsavedChanges(false);
   };
 
-  const deleteCoupon = async (couponId) => {
-    if (window.confirm('¿Estás seguro de eliminar este cupón? Los cambios se guardarán en el código fuente.')) {
+  const deleteCoupon = (couponId) => {
+    if (window.confirm('¿Estás seguro de eliminar este cupón? Los cambios se guardarán en memoria.')) {
       const updatedCoupons = coupons.filter(c => c.id !== couponId);
-      await updateCoupons(updatedCoupons);
       setCoupons(updatedCoupons);
+      toastHandler(ToastType.Success, '✅ Cupón eliminado (cambios en memoria)');
+      toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
     }
   };
+
+  const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      if (!window.confirm('¿Estás seguro de cancelar? Se perderán los cambios no guardados.')) {
+        return;
+      }
+    }
+    resetForm();
+  };
+
+  // Verificar si hay cambios pendientes
+  const hasChanges = coupons.length !== (storeConfig.coupons || []).length || 
+    JSON.stringify(coupons) !== JSON.stringify(storeConfig.coupons || []);
 
   return (
     <div className={styles.couponManager}>
       <div className={styles.header}>
         <h2>Gestión de Cupones</h2>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? 'Cancelar' : '+ Nuevo Cupón'}
-        </button>
+        <div className={styles.headerActions}>
+          {hasChanges && (
+            <span className={styles.changesIndicator}>
+              🔴 Cambios pendientes
+            </span>
+          )}
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowForm(!showForm)}
+          >
+            {showForm ? 'Cancelar' : '+ Nuevo Cupón'}
+          </button>
+        </div>
       </div>
 
-      <div className={styles.warningBox}>
-        <h4>⚠️ Importante</h4>
-        <p>Los cambios realizados aquí se guardarán directamente en el código fuente (constants.jsx), no en el almacenamiento local del navegador.</p>
+      <div className={styles.infoBox}>
+        <h4>ℹ️ Información Importante</h4>
+        <p>Los cambios se guardan temporalmente en memoria. Para aplicarlos permanentemente, ve a la sección "💾 Exportar/Importar" y exporta la configuración.</p>
       </div>
 
       {showForm && (
         <form className={styles.couponForm} onSubmit={handleSubmit}>
+          <div className={styles.formHeader}>
+            <h3>{editingCoupon ? 'Editar Cupón' : 'Nuevo Cupón'}</h3>
+            {hasUnsavedChanges && (
+              <span className={styles.unsavedIndicator}>
+                🔴 Cambios sin guardar
+              </span>
+            )}
+          </div>
+
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
               <label>Código del Cupón *</label>
@@ -189,9 +228,9 @@ const CouponManager = () => {
 
           <div className={styles.formActions}>
             <button type="submit" className="btn btn-primary">
-              {editingCoupon ? 'Actualizar Cupón' : 'Crear Cupón'}
+              💾 {editingCoupon ? 'Actualizar' : 'Crear'} Cupón (En Memoria)
             </button>
-            <button type="button" onClick={resetForm} className="btn btn-hipster">
+            <button type="button" onClick={handleCancel} className="btn btn-hipster">
               Cancelar
             </button>
           </div>
@@ -199,7 +238,16 @@ const CouponManager = () => {
       )}
 
       <div className={styles.couponsList}>
-        <h3>Cupones Existentes ({coupons.length})</h3>
+        <div className={styles.listHeader}>
+          <h3>Cupones Existentes ({coupons.length})</h3>
+          {hasChanges && (
+            <div className={styles.changesAlert}>
+              <span>🔴 Hay {Math.abs(coupons.length - (storeConfig.coupons || []).length)} cambios pendientes</span>
+              <small>Ve a "💾 Exportar/Importar" para aplicar los cambios</small>
+            </div>
+          )}
+        </div>
+
         {coupons.length === 0 ? (
           <p className={styles.emptyMessage}>No hay cupones creados aún.</p>
         ) : (

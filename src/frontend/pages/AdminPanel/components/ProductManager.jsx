@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useConfigContext } from '../../../contexts/ConfigContextProvider';
+import { useAllProductsContext } from '../../../contexts/ProductsContextProvider';
 import { toastHandler } from '../../../utils/utils';
 import { ToastType } from '../../../constants/constants';
 import { v4 as uuid } from 'uuid';
 import styles from './ProductManager.module.css';
 
 const ProductManager = () => {
-  const { storeConfig, updateProducts } = useConfigContext();
+  const { products: productsFromContext } = useAllProductsContext();
   
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -27,10 +28,10 @@ const ProductManager = () => {
     featured: false
   });
 
-  // Cargar productos desde la configuración
+  // Cargar productos desde el contexto
   useEffect(() => {
-    setProducts(storeConfig.products || []);
-  }, [storeConfig.products]);
+    setProducts(productsFromContext || []);
+  }, [productsFromContext]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -38,12 +39,14 @@ const ProductManager = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    setHasUnsavedChanges(true);
   };
 
   const handleColorChange = (index, field, value) => {
     const newColors = [...formData.colors];
     newColors[index] = { ...newColors[index], [field]: value };
     setFormData(prev => ({ ...prev, colors: newColors }));
+    setHasUnsavedChanges(true);
   };
 
   const addColor = () => {
@@ -51,12 +54,14 @@ const ProductManager = () => {
       ...prev,
       colors: [...prev.colors, { color: '#000000', colorQuantity: 0 }]
     }));
+    setHasUnsavedChanges(true);
   };
 
   const removeColor = (index) => {
     if (formData.colors.length > 1) {
       const newColors = formData.colors.filter((_, i) => i !== index);
       setFormData(prev => ({ ...prev, colors: newColors }));
+      setHasUnsavedChanges(true);
     }
   };
 
@@ -66,6 +71,7 @@ const ProductManager = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setFormData(prev => ({ ...prev, image: e.target.result }));
+        setHasUnsavedChanges(true);
       };
       reader.readAsDataURL(file);
     }
@@ -89,9 +95,11 @@ const ProductManager = () => {
       featured: product.featured || false
     });
     setIsEditing(true);
+    setHasUnsavedChanges(false);
   };
 
-  const handleSave = async () => {
+  // GUARDAR CAMBIOS EN MEMORIA LOCAL (NO EXPORTAR)
+  const handleSave = () => {
     // Validaciones
     if (!formData.name.trim()) {
       toastHandler(ToastType.Error, 'El nombre del producto es requerido');
@@ -123,19 +131,21 @@ const ProductManager = () => {
     let updatedProducts;
     if (selectedProduct) {
       updatedProducts = products.map(p => p._id === selectedProduct._id ? newProduct : p);
+      toastHandler(ToastType.Success, '✅ Producto actualizado (cambios en memoria)');
     } else {
       updatedProducts = [...products, newProduct];
+      toastHandler(ToastType.Success, '✅ Producto creado (cambios en memoria)');
     }
 
-    // Guardar en la configuración JSON (esto también guarda en código fuente)
-    const result = await updateProducts(updatedProducts);
-    
-    if (result) {
-      setProducts(updatedProducts);
-      setIsEditing(false);
-      setSelectedProduct(null);
-      resetForm();
-    }
+    // SOLO GUARDAR EN MEMORIA LOCAL - NO EXPORTAR
+    setProducts(updatedProducts);
+    setIsEditing(false);
+    setSelectedProduct(null);
+    setHasUnsavedChanges(false);
+    resetForm();
+
+    // Mostrar mensaje informativo
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const resetForm = () => {
@@ -154,47 +164,71 @@ const ProductManager = () => {
       isShippingAvailable: true,
       featured: false
     });
+    setHasUnsavedChanges(false);
   };
 
   const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      if (!window.confirm('¿Estás seguro de cancelar? Se perderán los cambios no guardados.')) {
+        return;
+      }
+    }
     setIsEditing(false);
     setSelectedProduct(null);
+    setHasUnsavedChanges(false);
     resetForm();
   };
 
-  const handleDelete = async (productId) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto? Los cambios se guardarán en el código fuente.')) {
+  // ELIMINAR PRODUCTO (SOLO EN MEMORIA)
+  const handleDelete = (productId) => {
+    if (!window.confirm('¿Estás seguro de eliminar este producto? Los cambios se guardarán en memoria.')) {
       return;
     }
 
     const updatedProducts = products.filter(p => p._id !== productId);
-    const result = await updateProducts(updatedProducts);
-    
-    if (result) {
-      setProducts(updatedProducts);
-    }
+    setProducts(updatedProducts);
+    toastHandler(ToastType.Success, '✅ Producto eliminado (cambios en memoria)');
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
+
+  // Verificar si hay cambios pendientes
+  const hasChanges = products.length !== productsFromContext.length || 
+    JSON.stringify(products) !== JSON.stringify(productsFromContext);
 
   return (
     <div className={styles.productManager}>
       <div className={styles.header}>
         <h2>Gestión de Productos</h2>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setIsEditing(true)}
-        >
-          ➕ Nuevo Producto
-        </button>
+        <div className={styles.headerActions}>
+          {hasChanges && (
+            <span className={styles.changesIndicator}>
+              🔴 Cambios pendientes
+            </span>
+          )}
+          <button 
+            className="btn btn-primary"
+            onClick={() => setIsEditing(true)}
+          >
+            ➕ Nuevo Producto
+          </button>
+        </div>
       </div>
 
-      <div className={styles.warningBox}>
-        <h4>⚠️ Importante</h4>
-        <p>Los cambios realizados aquí se guardarán directamente en el código fuente de la aplicación y se exportarán en el archivo JSON de configuración.</p>
+      <div className={styles.infoBox}>
+        <h4>ℹ️ Información Importante</h4>
+        <p>Los cambios se guardan temporalmente en memoria. Para aplicarlos permanentemente, ve a la sección "💾 Exportar/Importar" y exporta la configuración.</p>
       </div>
 
       {isEditing ? (
         <div className={styles.editForm}>
-          <h3>{selectedProduct ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+          <div className={styles.formHeader}>
+            <h3>{selectedProduct ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+            {hasUnsavedChanges && (
+              <span className={styles.unsavedIndicator}>
+                🔴 Cambios sin guardar
+              </span>
+            )}
+          </div>
           
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
@@ -235,19 +269,14 @@ const ProductManager = () => {
 
             <div className={styles.formGroup}>
               <label>Categoría</label>
-              <select
+              <input
+                type="text"
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="form-select"
-              >
-                <option value="">Seleccionar categoría</option>
-                {(storeConfig.categories || []).map(cat => (
-                  <option key={cat._id} value={cat.categoryName}>
-                    {cat.categoryName}
-                  </option>
-                ))}
-              </select>
+                className="form-input"
+                placeholder="Categoría"
+              />
             </div>
 
             <div className={styles.formGroup}>
@@ -397,7 +426,7 @@ const ProductManager = () => {
 
           <div className={styles.formActions}>
             <button onClick={handleSave} className="btn btn-primary">
-              💾 Guardar en Código Fuente
+              💾 Guardar Cambios (En Memoria)
             </button>
             <button onClick={handleCancel} className="btn btn-danger">
               ❌ Cancelar
@@ -406,6 +435,16 @@ const ProductManager = () => {
         </div>
       ) : (
         <div className={styles.productList}>
+          <div className={styles.listHeader}>
+            <h3>Productos Existentes ({products.length})</h3>
+            {hasChanges && (
+              <div className={styles.changesAlert}>
+                <span>🔴 Hay {Math.abs(products.length - productsFromContext.length)} cambios pendientes</span>
+                <small>Ve a "💾 Exportar/Importar" para aplicar los cambios</small>
+              </div>
+            )}
+          </div>
+          
           <div className={styles.productGrid}>
             {products.map(product => (
               <div key={product._id} className={styles.productCard}>

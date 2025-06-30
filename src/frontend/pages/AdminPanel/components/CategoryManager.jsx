@@ -6,10 +6,11 @@ import { useAllProductsContext } from '../../../contexts/ProductsContextProvider
 import styles from './CategoryManager.module.css';
 
 const CategoryManager = () => {
-  const { categories } = useAllProductsContext();
+  const { categories: categoriesFromContext } = useAllProductsContext();
   const [localCategories, setLocalCategories] = useState([]);
   const [editingCategory, setEditingCategory] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const initialCategoryState = {
     categoryName: '',
@@ -21,8 +22,8 @@ const CategoryManager = () => {
 
   // Cargar categorías desde el contexto
   useEffect(() => {
-    setLocalCategories(categories || []);
-  }, [categories]);
+    setLocalCategories(categoriesFromContext || []);
+  }, [categoriesFromContext]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,6 +31,7 @@ const CategoryManager = () => {
       ...prev,
       [name]: value
     }));
+    setHasUnsavedChanges(true);
   };
 
   const handleImageUpload = (e) => {
@@ -38,38 +40,14 @@ const CategoryManager = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setCategoryForm(prev => ({ ...prev, categoryImage: e.target.result }));
+        setHasUnsavedChanges(true);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const saveToSourceCode = async (updatedCategories) => {
-    try {
-      // Simular guardado en el código fuente
-      // En una implementación real, esto haría una llamada al backend
-      // para actualizar el archivo de categorías
-      
-      const categoriesData = updatedCategories.map(cat => ({
-        _id: cat._id,
-        categoryName: cat.categoryName,
-        categoryImage: cat.categoryImage,
-        description: cat.description || '',
-      }));
-
-      // Aquí iría la lógica para escribir al archivo fuente
-      console.log('Guardando categorías en el código fuente:', categoriesData);
-      
-      // Simular delay de guardado
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      return true;
-    } catch (error) {
-      console.error('Error al guardar en código fuente:', error);
-      return false;
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  // GUARDAR CAMBIOS EN MEMORIA LOCAL (NO EXPORTAR)
+  const handleSubmit = (e) => {
     e.preventDefault();
     
     // Validaciones
@@ -103,30 +81,25 @@ const CategoryManager = () => {
     let updatedCategories;
     if (editingCategory) {
       updatedCategories = localCategories.map(c => c._id === editingCategory._id ? newCategory : c);
-      toastHandler(ToastType.Info, 'Guardando cambios en el código fuente...');
+      toastHandler(ToastType.Success, '✅ Categoría actualizada (cambios en memoria)');
     } else {
       updatedCategories = [...localCategories, newCategory];
-      toastHandler(ToastType.Info, 'Creando categoría en el código fuente...');
+      toastHandler(ToastType.Success, '✅ Categoría creada (cambios en memoria)');
     }
 
-    // Guardar en el código fuente
-    const saved = await saveToSourceCode(updatedCategories);
-    
-    if (saved) {
-      setLocalCategories(updatedCategories);
-      toastHandler(ToastType.Success, 
-        editingCategory ? 'Categoría actualizada en el código fuente' : 'Categoría creada en el código fuente'
-      );
-      resetForm();
-    } else {
-      toastHandler(ToastType.Error, 'Error al guardar en el código fuente');
-    }
+    // SOLO GUARDAR EN MEMORIA LOCAL - NO EXPORTAR
+    setLocalCategories(updatedCategories);
+    resetForm();
+
+    // Mostrar mensaje informativo
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const resetForm = () => {
     setCategoryForm(initialCategoryState);
     setEditingCategory(null);
     setShowForm(false);
+    setHasUnsavedChanges(false);
   };
 
   const editCategory = (category) => {
@@ -137,70 +110,83 @@ const CategoryManager = () => {
     });
     setEditingCategory(category);
     setShowForm(true);
+    setHasUnsavedChanges(false);
   };
 
-  const toggleCategoryStatus = async (categoryId) => {
-    const category = localCategories.find(c => c._id === categoryId);
-    if (!category) return;
-
+  const toggleCategoryStatus = (categoryId) => {
     const updatedCategories = localCategories.map(c => 
       c._id === categoryId 
         ? { ...c, disabled: !c.disabled }
         : c
     );
 
-    toastHandler(ToastType.Info, 'Actualizando estado en el código fuente...');
-    
-    const saved = await saveToSourceCode(updatedCategories);
-    
-    if (saved) {
-      setLocalCategories(updatedCategories);
-      toastHandler(ToastType.Success, 
-        `Categoría ${category.disabled ? 'habilitada' : 'deshabilitada'} en el código fuente`
-      );
-    } else {
-      toastHandler(ToastType.Error, 'Error al actualizar el código fuente');
-    }
+    setLocalCategories(updatedCategories);
+    const category = localCategories.find(c => c._id === categoryId);
+    toastHandler(ToastType.Success, 
+      `✅ Categoría ${category.disabled ? 'habilitada' : 'deshabilitada'} (cambios en memoria)`
+    );
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
-  const deleteCategory = async (categoryId) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta categoría? Esta acción se guardará en el código fuente.')) {
+  const deleteCategory = (categoryId) => {
+    if (!window.confirm('¿Estás seguro de eliminar esta categoría? Los cambios se guardarán en memoria.')) {
       return;
     }
 
-    toastHandler(ToastType.Info, 'Eliminando categoría del código fuente...');
-    
     const updatedCategories = localCategories.filter(c => c._id !== categoryId);
-    
-    const saved = await saveToSourceCode(updatedCategories);
-    
-    if (saved) {
-      setLocalCategories(updatedCategories);
-      toastHandler(ToastType.Success, 'Categoría eliminada del código fuente');
-    } else {
-      toastHandler(ToastType.Error, 'Error al eliminar del código fuente');
-    }
+    setLocalCategories(updatedCategories);
+    toastHandler(ToastType.Success, '✅ Categoría eliminada (cambios en memoria)');
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
+
+  const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      if (!window.confirm('¿Estás seguro de cancelar? Se perderán los cambios no guardados.')) {
+        return;
+      }
+    }
+    resetForm();
+  };
+
+  // Verificar si hay cambios pendientes
+  const hasChanges = localCategories.length !== categoriesFromContext.length || 
+    JSON.stringify(localCategories) !== JSON.stringify(categoriesFromContext);
 
   return (
     <div className={styles.categoryManager}>
       <div className={styles.header}>
         <h2>Gestión de Categorías</h2>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? 'Cancelar' : '+ Nueva Categoría'}
-        </button>
+        <div className={styles.headerActions}>
+          {hasChanges && (
+            <span className={styles.changesIndicator}>
+              🔴 Cambios pendientes
+            </span>
+          )}
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowForm(!showForm)}
+          >
+            {showForm ? 'Cancelar' : '+ Nueva Categoría'}
+          </button>
+        </div>
       </div>
 
-      <div className={styles.warningBox}>
-        <h4>⚠️ Importante</h4>
-        <p>Los cambios realizados aquí se guardarán directamente en el código fuente de la aplicación, no en el almacenamiento local del navegador.</p>
+      <div className={styles.infoBox}>
+        <h4>ℹ️ Información Importante</h4>
+        <p>Los cambios se guardan temporalmente en memoria. Para aplicarlos permanentemente, ve a la sección "💾 Exportar/Importar" y exporta la configuración.</p>
       </div>
 
       {showForm && (
         <form className={styles.categoryForm} onSubmit={handleSubmit}>
+          <div className={styles.formHeader}>
+            <h3>{editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}</h3>
+            {hasUnsavedChanges && (
+              <span className={styles.unsavedIndicator}>
+                🔴 Cambios sin guardar
+              </span>
+            )}
+          </div>
+
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
               <label>Nombre de la Categoría *</label>
@@ -254,9 +240,9 @@ const CategoryManager = () => {
 
           <div className={styles.formActions}>
             <button type="submit" className="btn btn-primary">
-              {editingCategory ? 'Actualizar Categoría' : 'Crear Categoría'}
+              💾 {editingCategory ? 'Actualizar' : 'Crear'} Categoría (En Memoria)
             </button>
-            <button type="button" onClick={resetForm} className="btn btn-hipster">
+            <button type="button" onClick={handleCancel} className="btn btn-hipster">
               Cancelar
             </button>
           </div>
@@ -264,7 +250,16 @@ const CategoryManager = () => {
       )}
 
       <div className={styles.categoriesList}>
-        <h3>Categorías Existentes ({localCategories.length})</h3>
+        <div className={styles.listHeader}>
+          <h3>Categorías Existentes ({localCategories.length})</h3>
+          {hasChanges && (
+            <div className={styles.changesAlert}>
+              <span>🔴 Hay {Math.abs(localCategories.length - categoriesFromContext.length)} cambios pendientes</span>
+              <small>Ve a "💾 Exportar/Importar" para aplicar los cambios</small>
+            </div>
+          )}
+        </div>
+
         {localCategories.length === 0 ? (
           <p className={styles.emptyMessage}>No hay categorías creadas aún.</p>
         ) : (
