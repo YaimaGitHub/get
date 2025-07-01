@@ -12,7 +12,6 @@ const ConfigContextProvider = ({ children }) => {
     coupons: COUPONS,
     zones: SANTIAGO_ZONES,
     products: [],
-    categories: [],
     lastModified: new Date().toISOString()
   });
 
@@ -81,16 +80,6 @@ const ConfigContextProvider = ({ children }) => {
     saveConfig(updatedConfig);
   };
 
-  // Actualizar categorías
-  const updateCategories = (newCategories) => {
-    const updatedConfig = {
-      ...storeConfig,
-      categories: newCategories,
-      lastModified: new Date().toISOString()
-    };
-    saveConfig(updatedConfig);
-  };
-
   // Exportar configuración
   const exportConfiguration = () => {
     const configToExport = {
@@ -147,7 +136,6 @@ const ConfigContextProvider = ({ children }) => {
       coupons: COUPONS,
       zones: SANTIAGO_ZONES,
       products: [],
-      categories: [],
       lastModified: new Date().toISOString()
     };
     
@@ -162,7 +150,6 @@ const ConfigContextProvider = ({ children }) => {
       updateZones,
       updateStoreInfo,
       updateProducts,
-      updateCategories,
       exportConfiguration,
       importConfiguration,
       resetConfiguration,

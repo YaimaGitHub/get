@@ -31,7 +31,6 @@ const LoginPage = () => {
   };
   const [userInputs, setUserInputs] = useState(initialLoginState);
   const [activeBtnLoader, setActiveBtnLoader] = useState('');
-  const [showAdminFields, setShowAdminFields] = useState(false);
   const locationOfLogin = useLocation();
 
   const handleUserInput = (e) => {
@@ -47,7 +46,7 @@ const LoginPage = () => {
     if (clickType === LOGIN_CLICK_TYPE.GuestClick) {
       userInfo = TEST_USER;
     } else if (clickType === LOGIN_CLICK_TYPE.AdminClick) {
-      // Para admin, verificar que los campos estén llenos
+      // Para admin, usar las credenciales del formulario
       if (!userInputs.email.trim() || !userInputs.password.trim()) {
         toastHandler(ToastType.Error, 'Por favor ingresa las credenciales de administrador');
         return;
@@ -115,11 +114,6 @@ const LoginPage = () => {
     setActiveBtnLoader('');
   };
 
-  const handleAdminAccess = () => {
-    setShowAdminFields(true);
-    setUserInputs({ email: '', password: '' }); // Limpiar campos
-  };
-
   //  if user is registered and trying to login through url, show this and navigate to home using useNavigateIfRegistered().
   if (!!user) {
     return <main className='full-page'></main>;
@@ -176,30 +170,19 @@ const LoginPage = () => {
           )}
         </button>
 
-        {/* Admin Access button - Solo muestra el botón inicial */}
-        {!showAdminFields ? (
-          <button
-            disabled={!!activeBtnLoader}
-            className='btn btn-block btn-danger'
-            type='button'
-            onClick={handleAdminAccess}
-          >
-            👑 Acceso Administrador
-          </button>
-        ) : (
-          <button
-            disabled={!!activeBtnLoader}
-            className='btn btn-block btn-danger'
-            type='button'
-            onClick={(e) => handleSubmit(e, LOGIN_CLICK_TYPE.AdminClick)}
-          >
-            {activeBtnLoader === LOGIN_CLICK_TYPE.AdminClick ? (
-              <span className='loader-2'></span>
-            ) : (
-              '🔐 Iniciar Sesión como Administrador'
-            )}
-          </button>
-        )}
+        {/* Admin Login button */}
+        <button
+          disabled={!!activeBtnLoader}
+          className='btn btn-block btn-danger'
+          type='button'
+          onClick={(e) => handleSubmit(e, LOGIN_CLICK_TYPE.AdminClick)}
+        >
+          {activeBtnLoader === LOGIN_CLICK_TYPE.AdminClick ? (
+            <span className='loader-2'></span>
+          ) : (
+            '👑 Acceso Administrador'
+          )}
+        </button>
       </form>
 
       <div>

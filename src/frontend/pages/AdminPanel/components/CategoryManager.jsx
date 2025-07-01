@@ -3,12 +3,10 @@ import { v4 as uuid } from 'uuid';
 import { toastHandler } from '../../../utils/utils';
 import { ToastType } from '../../../constants/constants';
 import { useAllProductsContext } from '../../../contexts/ProductsContextProvider';
-import { useConfigContext } from '../../../contexts/ConfigContextProvider';
 import styles from './CategoryManager.module.css';
 
 const CategoryManager = () => {
   const { categories: categoriesFromContext } = useAllProductsContext();
-  const { updateCategories } = useConfigContext();
   const [localCategories, setLocalCategories] = useState([]);
   const [editingCategory, setEditingCategory] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -48,7 +46,7 @@ const CategoryManager = () => {
     }
   };
 
-  // GUARDAR CAMBIOS EN MEMORIA LOCAL Y SINCRONIZAR
+  // GUARDAR CAMBIOS EN MEMORIA LOCAL (NO EXPORTAR)
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -78,30 +76,23 @@ const CategoryManager = () => {
       ...categoryForm,
       _id: editingCategory ? editingCategory._id : uuid(),
       categoryName: categoryForm.categoryName.toLowerCase().trim(),
-      id: editingCategory ? editingCategory.id : (localCategories.length + 1).toString()
     };
 
     let updatedCategories;
     if (editingCategory) {
       updatedCategories = localCategories.map(c => c._id === editingCategory._id ? newCategory : c);
-      toastHandler(ToastType.Success, '✅ Categoría actualizada exitosamente');
+      toastHandler(ToastType.Success, '✅ Categoría actualizada (cambios en memoria)');
     } else {
       updatedCategories = [...localCategories, newCategory];
-      toastHandler(ToastType.Success, '✅ Categoría creada exitosamente');
+      toastHandler(ToastType.Success, '✅ Categoría creada (cambios en memoria)');
     }
 
-    // GUARDAR EN MEMORIA LOCAL Y SINCRONIZAR CON EL CONTEXTO
+    // SOLO GUARDAR EN MEMORIA LOCAL - NO EXPORTAR
     setLocalCategories(updatedCategories);
-    
-    // Actualizar en el contexto de configuración para sincronización
-    if (updateCategories) {
-      updateCategories(updatedCategories);
-    }
-    
     resetForm();
 
     // Mostrar mensaje informativo
-    toastHandler(ToastType.Info, 'Para aplicar los cambios permanentemente, ve a "💾 Exportar/Importar" y exporta la configuración');
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const resetForm = () => {
@@ -130,34 +121,22 @@ const CategoryManager = () => {
     );
 
     setLocalCategories(updatedCategories);
-    
-    // Sincronizar con el contexto
-    if (updateCategories) {
-      updateCategories(updatedCategories);
-    }
-    
     const category = localCategories.find(c => c._id === categoryId);
     toastHandler(ToastType.Success, 
-      `✅ Categoría ${category.disabled ? 'habilitada' : 'deshabilitada'} exitosamente`
+      `✅ Categoría ${category.disabled ? 'habilitada' : 'deshabilitada'} (cambios en memoria)`
     );
-    toastHandler(ToastType.Info, 'Para aplicar los cambios permanentemente, ve a "💾 Exportar/Importar" y exporta la configuración');
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const deleteCategory = (categoryId) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta categoría? Esta acción afectará todos los productos de esta categoría.')) {
+    if (!window.confirm('¿Estás seguro de eliminar esta categoría? Los cambios se guardarán en memoria.')) {
       return;
     }
 
     const updatedCategories = localCategories.filter(c => c._id !== categoryId);
     setLocalCategories(updatedCategories);
-    
-    // Sincronizar con el contexto
-    if (updateCategories) {
-      updateCategories(updatedCategories);
-    }
-    
-    toastHandler(ToastType.Success, '✅ Categoría eliminada exitosamente');
-    toastHandler(ToastType.Info, 'Para aplicar los cambios permanentemente, ve a "💾 Exportar/Importar" y exporta la configuración');
+    toastHandler(ToastType.Success, '✅ Categoría eliminada (cambios en memoria)');
+    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const handleCancel = () => {
@@ -194,7 +173,7 @@ const CategoryManager = () => {
 
       <div className={styles.infoBox}>
         <h4>ℹ️ Información Importante</h4>
-        <p>Los cambios se sincronizan automáticamente en la tienda. Para aplicarlos permanentemente, ve a la sección "💾 Exportar/Importar" y exporta la configuración.</p>
+        <p>Los cambios se guardan temporalmente en memoria. Para aplicarlos permanentemente, ve a la sección "💾 Exportar/Importar" y exporta la configuración.</p>
       </div>
 
       {showForm && (
@@ -251,7 +230,6 @@ const CategoryManager = () => {
               onChange={handleInputChange}
               className="form-input"
               placeholder="https://ejemplo.com/imagen.jpg"
-              required
             />
             {categoryForm.categoryImage && (
               <div className={styles.imagePreview}>
@@ -262,7 +240,7 @@ const CategoryManager = () => {
 
           <div className={styles.formActions}>
             <button type="submit" className="btn btn-primary">
-              💾 {editingCategory ? 'Actualizar' : 'Crear'} Categoría
+              💾 {editingCategory ? 'Actualizar' : 'Crear'} Categoría (En Memoria)
             </button>
             <button type="button" onClick={handleCancel} className="btn btn-hipster">
               Cancelar
@@ -277,7 +255,7 @@ const CategoryManager = () => {
           {hasChanges && (
             <div className={styles.changesAlert}>
               <span>🔴 Hay {Math.abs(localCategories.length - categoriesFromContext.length)} cambios pendientes</span>
-              <small>Ve a "💾 Exportar/Importar" para aplicar los cambios permanentemente</small>
+              <small>Ve a "💾 Exportar/Importar" para aplicar los cambios</small>
             </div>
           )}
         </div>
