@@ -203,24 +203,54 @@ export const COUNTRY_CODES = [
 
   // Función para generar el contenido de products.js actualizado
   const generateProductsFile = () => {
+    // Usar los productos del localStorage si están disponibles, sino usar los del contexto
+    const savedConfig = localStorage.getItem('adminStoreConfig');
+    let productsToExport = products || [];
+    
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        if (parsedConfig.products && parsedConfig.products.length > 0) {
+          productsToExport = parsedConfig.products;
+        }
+      } catch (error) {
+        console.error('Error al cargar productos guardados:', error);
+      }
+    }
+
     const productsContent = `/**
  * Product Database can be added here.
  * You can add products of your wish with different attributes
  * */
 
-export const products = ${JSON.stringify(products || [], null, 2)};
+export const products = ${JSON.stringify(productsToExport, null, 2)};
 `;
     return productsContent;
   };
 
   // Función para generar el contenido de categories.js actualizado
   const generateCategoriesFile = () => {
+    // Usar las categorías del localStorage si están disponibles, sino usar las del contexto
+    const savedConfig = localStorage.getItem('adminStoreConfig');
+    let categoriesToExport = categories || [];
+    
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        if (parsedConfig.categories && parsedConfig.categories.length > 0) {
+          categoriesToExport = parsedConfig.categories;
+        }
+      } catch (error) {
+        console.error('Error al cargar categorías guardadas:', error);
+      }
+    }
+
     const categoriesContent = `/**
  * Category Database can be added here.
  * You can add category of your wish with different attributes
  * */
 
-export const categories = ${JSON.stringify(categories || [], null, 2)};
+export const categories = ${JSON.stringify(categoriesToExport, null, 2)};
 `;
     return categoriesContent;
   };
@@ -295,7 +325,8 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       });
 
       // Agregar archivo de configuración JSON completo
-      const fullConfig = {
+      const savedConfig = localStorage.getItem('adminStoreConfig');
+      let fullConfig = {
         storeConfig,
         products,
         categories,
@@ -303,6 +334,21 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
         exportDate: new Date().toISOString(),
         version: '2.0.0'
       };
+
+      // Si hay configuración guardada, usarla
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          fullConfig = {
+            ...fullConfig,
+            ...parsedConfig,
+            exportDate: new Date().toISOString(),
+            version: '2.0.0'
+          };
+        } catch (error) {
+          console.error('Error al cargar configuración guardada:', error);
+        }
+      }
       
       backupFolder.file('full-config.json', JSON.stringify(fullConfig, null, 2));
 
@@ -319,8 +365,8 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       
       URL.revokeObjectURL(url);
       
-      toastHandler(ToastType.Success, '🎉 Backup exportado exitosamente a la carpeta backup');
-      toastHandler(ToastType.Info, 'Los archivos han sido actualizados con todos los cambios realizados en el panel');
+      toastHandler(ToastType.Success, '🎉 Backup exportado exitosamente');
+      toastHandler(ToastType.Info, 'Los archivos incluyen todos los cambios realizados en productos, categorías, cupones y configuraciones');
       
     } catch (error) {
       console.error('Error al exportar backup:', error);
@@ -329,6 +375,35 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       setIsExporting(false);
     }
   };
+
+  // Obtener estadísticas actualizadas
+  const getStats = () => {
+    const savedConfig = localStorage.getItem('adminStoreConfig');
+    let stats = {
+      products: products?.length || 0,
+      categories: categories?.length || 0,
+      coupons: storeConfig.coupons?.length || 0,
+      zones: storeConfig.zones?.length || 0
+    };
+
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        stats = {
+          products: parsedConfig.products?.length || stats.products,
+          categories: parsedConfig.categories?.length || stats.categories,
+          coupons: parsedConfig.coupons?.length || stats.coupons,
+          zones: parsedConfig.zones?.length || stats.zones
+        };
+      } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+      }
+    }
+
+    return stats;
+  };
+
+  const stats = getStats();
 
   return (
     <div className={styles.backupManager}>
@@ -372,10 +447,10 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
             <div className={styles.changesSummary}>
               <h4>📊 Resumen de cambios a exportar:</h4>
               <ul>
-                <li>🎫 {storeConfig.coupons?.length || 0} cupones configurados</li>
-                <li>📍 {storeConfig.zones?.length || 0} zonas de entrega</li>
-                <li>📦 {products?.length || 0} productos en catálogo</li>
-                <li>📂 {categories?.length || 0} categorías disponibles</li>
+                <li>🎫 {stats.coupons} cupones configurados</li>
+                <li>📍 {stats.zones} zonas de entrega</li>
+                <li>📦 {stats.products} productos en catálogo</li>
+                <li>📂 {stats.categories} categorías disponibles</li>
                 <li>💬 {Object.keys(JSON.parse(localStorage.getItem('storeMessages') || '{}')).length} categorías de mensajes</li>
               </ul>
             </div>
