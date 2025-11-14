@@ -7,7 +7,7 @@ import styles from './StoreSettings.module.css';
 const StoreSettings = () => {
   const { storeConfig, updateStoreInfo, updateZones } = useConfigContext();
   const [storeSettings, setStoreSettings] = useState({
-    storeName: 'Gada Electronics',
+    storeName: 'Yero Shop!',
     whatsappNumber: '+53 54690878',
     storeAddressId: 'store-main-address',
   });
@@ -21,7 +21,7 @@ const StoreSettings = () => {
   useEffect(() => {
     if (storeConfig.storeInfo) {
       setStoreSettings({
-        storeName: storeConfig.storeInfo.storeName || 'Gada Electronics',
+        storeName: storeConfig.storeInfo.storeName || 'Yero Shop!',
         whatsappNumber: storeConfig.storeInfo.whatsappNumber || '+53 54690878',
         storeAddressId: storeConfig.storeInfo.storeAddressId || 'store-main-address',
       });
@@ -72,6 +72,16 @@ const StoreSettings = () => {
     }
 
     updateStoreInfo(storeSettings);
+    
+    // Disparar eventos de sincronización adicionales
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('storeInfoUpdated', { 
+        detail: { storeInfo: storeSettings } 
+      }));
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'storeInfo', data: storeSettings } 
+      }));
+    }, 10);
   };
 
   const handleZoneSubmit = (e) => {
@@ -101,6 +111,17 @@ const StoreSettings = () => {
 
     updateZones(updatedZones);
     setZones(updatedZones);
+    
+    // Disparar eventos de sincronización
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('zonesUpdated', { 
+        detail: { zones: updatedZones } 
+      }));
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'zones', data: updatedZones } 
+      }));
+    }, 10);
+    
     resetZoneForm();
   };
 
@@ -125,6 +146,17 @@ const StoreSettings = () => {
       const updatedZones = zones.filter(zone => zone.id !== zoneId);
       updateZones(updatedZones);
       setZones(updatedZones);
+      
+      // Disparar eventos de sincronización
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('zonesUpdated', { 
+          detail: { zones: updatedZones } 
+        }));
+        window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+          detail: { type: 'zones', data: updatedZones } 
+        }));
+      }, 10);
+      
       toastHandler(ToastType.Success, 'Zona eliminada exitosamente');
     }
   };

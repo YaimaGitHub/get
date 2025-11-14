@@ -1,21 +1,22 @@
 import { AiFillGithub, AiFillLinkedin, AiOutlineTwitter } from 'react-icons/ai';
+import { MdOutlineFacebook } from 'react-icons/md';
 import { v4 as uuid } from 'uuid';
 
 export const FOOTER_LINKS = [
   {
     id: 1,
     icon: <AiOutlineTwitter />,
-    url: 'https://twitter.com/Swastik2001',
+    url: 'https://x.com/yero_shop',
   },
   {
     id: 2,
-    icon: <AiFillLinkedin />,
-    url: 'https://www.linkedin.com/in/swastik-patro-2a54bb19b/',
+    icon: <MdOutlineFacebook />,
+    url: 'https://www.facebook.com/tvalacarta',
   },
   {
     id: 3,
-    icon: <AiFillGithub />,
-    url: 'https://github.com/swastikpatro',
+    icon: <AiFillLinkedin />,
+    url: 'https://www.linkedin.com/in/yero-shop-com-a47599373',
   },
 ];
 
@@ -36,8 +37,8 @@ export const SORT_TYPE = {
 export const RATINGS = [4, 3, 2, 1];
 
 export const TEST_USER = {
-  email: 'jethalal.gada@gmail.com',
-  password: 'babitaji1234',
+  email: 'yero.shop@gmail.com',
+  password: 'yeroi1234',
 };
 
 export const SUPER_ADMIN = {
@@ -54,6 +55,7 @@ export const LOCAL_STORAGE_KEYS = {
   User: 'user',
   Token: 'token',
   StoreConfig: 'storeConfig',
+  Currency: 'selectedCurrency',
 };
 
 export const LOGIN_CLICK_TYPE = {
@@ -113,109 +115,129 @@ export const SERVICE_TYPES = {
 export const SANTIAGO_ZONES = [
   {
     "id": "centro",
-    "name": "Centro Histórico",
-    "cost": 50
+    "name": "Nuevo Vista Alegre",
+    "cost": 100
   },
   {
     "id": "vista_alegre",
     "name": "Vista Alegre",
-    "cost": 75
+    "cost": 300
   },
   {
     "id": "sueno",
     "name": "Sueño",
-    "cost": 60
+    "cost": 250
   },
   {
     "id": "san_pedrito",
     "name": "San Pedrito",
-    "cost": 80
+    "cost": 150
   },
   {
     "id": "altamira",
     "name": "Altamira",
-    "cost": 70
-  },
-  {
-    "id": "reparto_flores",
-    "name": "Reparto Flores",
-    "cost": 65
-  },
-  {
-    "id": "chicharrones",
-    "name": "Chicharrones",
-    "cost": 85
-  },
-  {
-    "id": "los_olmos",
-    "name": "Los Olmos",
-    "cost": 90
-  },
-  {
-    "id": "santa_barbara",
-    "name": "Santa Bárbara",
-    "cost": 95
+    "cost": 500
   },
   {
     "id": "micro_9",
-    "name": "Micro 9",
-    "cost": 100
-  },
-  {
-    "id": "micro_4",
-    "name": "Micro 4",
-    "cost": 100
+    "name": "Micro 7, 8 , 9",
+    "cost": 150
   },
   {
     "id": "alameda",
     "name": "Alameda",
-    "cost": 55
+    "cost": 250
   },
   {
     "id": "puerto",
-    "name": "Puerto",
-    "cost": 45
+    "name": "El Caney",
+    "cost": 1000
   },
   {
     "id": "siboney",
-    "name": "Siboney",
-    "cost": 120
+    "name": "Quintero",
+    "cost": 500
   },
   {
     "id": "ciudamar",
-    "name": "Ciudamar",
-    "cost": 110
+    "name": "Distrito José Martí",
+    "cost": 150
+  },
+  {
+    "id": "marimon",
+    "name": "Marimon",
+    "cost": 100
+  },
+  {
+    "id": "los_cangrejitos",
+    "name": "Los cangrejitos",
+    "cost": 350
+  },
+  {
+    "id": "trocha",
+    "name": "Trocha",
+    "cost": 350
+  },
+  {
+    "id": "versalles",
+    "name": "Versalles",
+    "cost": 1000
+  },
+  {
+    "id": "portuondo",
+    "name": "Portuondo",
+    "cost": 600
+  },
+  {
+    "id": "30_de_noviembre",
+    "name": "30 de Noviembre",
+    "cost": 600
+  },
+  {
+    "id": "rajayoga",
+    "name": "Rajayoga",
+    "cost": 800
+  },
+  {
+    "id": "antonio_maceo",
+    "name": "Antonio Maceo",
+    "cost": 600
+  },
+  {
+    "id": "los_pinos",
+    "name": "Los Pinos",
+    "cost": 200
   }
 ];
 
 // Cupones de descuento - ACTUALIZADOS
 export const COUPONS = [
   {
-    "couponCode": "PEPEP",
+    "couponCode": "100% AHORRO",
     "text": "100% Descuento",
     "discountPercent": 55,
-    "minCartPriceRequired": 150000,
+    "minCartPriceRequired": 300000,
     "id": "b6c7a585-79a2-4fde-93cd-80422ef3acfa"
   },
   {
-    "couponCode": "PEPE 2",
+    "couponCode": "20% REGALO",
     "text": "20% Descuento",
     "discountPercent": 20,
-    "minCartPriceRequired": 100000,
+    "minCartPriceRequired": 200000,
     "id": "ecdff7ad-f653-467f-9257-7fcd0fdea3a8"
   },
   {
-    "couponCode": "PEPE 3",
+    "couponCode": "10% PROMO",
     "text": "10% Descuento",
     "discountPercent": 10,
-    "minCartPriceRequired": 50000,
+    "minCartPriceRequired": 100000,
     "id": "4898bd1c-7227-47b0-b6fe-32159f71072b"
   },
   {
-    "couponCode": "PEPE 4",
+    "couponCode": "5% MENOS",
     "text": "5% Descuento",
     "discountPercent": 5,
-    "minCartPriceRequired": 20000,
+    "minCartPriceRequired": 50000,
     "id": "12ee6cb8-1d2d-463d-b9f7-78bcd415c2e4"
   }
 ];
@@ -233,56 +255,99 @@ export const STORE_WHATSAPP = '+53 54690878';
 
 // Configuración por defecto de la tienda - ACTUALIZADA
 export const DEFAULT_STORE_CONFIG = {
-  "storeName": "Gada Electronicssss",
+  "storeName": "Yero Shop!",
   "whatsappNumber": "+53 54690878",
-  "storeAddressId": "store-main-address"
+  "storeAddress": "Santiago de Cuba, Cuba",
+  "lastModified": "2025-08-06T08:19:50.172Z",
+  "version": "1.0.0"
 };
 
+// CÓDIGOS DE PAÍSES ACTUALIZADOS CON CUBA INCLUIDO
 export const COUNTRY_CODES = [
-  { code: '+1', country: 'Estados Unidos/Canadá', flag: '🇺🇸' },
-  { code: '+7', country: 'Rusia', flag: '🇷🇺' },
-  { code: '+20', country: 'Egipto', flag: '🇪🇬' },
-  { code: '+27', country: 'Sudáfrica', flag: '🇿🇦' },
-  { code: '+30', country: 'Grecia', flag: '🇬🇷' },
-  { code: '+31', country: 'Países Bajos', flag: '🇳🇱' },
-  { code: '+32', country: 'Bélgica', flag: '🇧🇪' },
-  { code: '+33', country: 'Francia', flag: '🇫🇷' },
-  { code: '+34', country: 'España', flag: '🇪🇸' },
-  { code: '+36', country: 'Hungría', flag: '🇭🇺' },
-  { code: '+39', country: 'Italia', flag: '🇮🇹' },
-  { code: '+40', country: 'Rumania', flag: '🇷🇴' },
-  { code: '+41', country: 'Suiza', flag: '🇨🇭' },
-  { code: '+43', country: 'Austria', flag: '🇦🇹' },
-  { code: '+44', country: 'Reino Unido', flag: '🇬🇧' },
-  { code: '+45', country: 'Dinamarca', flag: '🇩🇰' },
-  { code: '+46', country: 'Suecia', flag: '🇸🇪' },
-  { code: '+47', country: 'Noruega', flag: '🇳🇴' },
-  { code: '+48', country: 'Polonia', flag: '🇵🇱' },
-  { code: '+49', country: 'Alemania', flag: '🇩🇪' },
-  { code: '+51', country: 'Perú', flag: '🇵🇪' },
-  { code: '+52', country: 'México', flag: '🇲🇽' },
-  { code: '+53', country: 'Cuba', flag: '🇨🇺' },
-  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
-  { code: '+55', country: 'Brasil', flag: '🇧🇷' },
-  { code: '+56', country: 'Chile', flag: '🇨🇱' },
-  { code: '+57', country: 'Colombia', flag: '🇨🇴' },
-  { code: '+58', country: 'Venezuela', flag: '🇻🇪' },
-  { code: '+60', country: 'Malasia', flag: '🇲🇾' },
-  { code: '+61', country: 'Australia', flag: '🇦🇺' },
-  { code: '+62', country: 'Indonesia', flag: '🇮🇩' },
-  { code: '+63', country: 'Filipinas', flag: '🇵🇭' },
-  { code: '+64', country: 'Nueva Zelanda', flag: '🇳🇿' },
-  { code: '+65', country: 'Singapur', flag: '🇸🇬' },
-  { code: '+66', country: 'Tailandia', flag: '🇹🇭' },
-  { code: '+81', country: 'Japón', flag: '🇯🇵' },
-  { code: '+82', country: 'Corea del Sur', flag: '🇰🇷' },
-  { code: '+84', country: 'Vietnam', flag: '🇻🇳' },
-  { code: '+86', country: 'China', flag: '🇨🇳' },
-  { code: '+90', country: 'Turquía', flag: '🇹🇷' },
-  { code: '+91', country: 'India', flag: '🇮🇳' },
-  { code: '+92', country: 'Pakistán', flag: '🇵🇰' },
-  { code: '+93', country: 'Afganistán', flag: '🇦🇫' },
-  { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
-  { code: '+95', country: 'Myanmar', flag: '🇲🇲' },
-  { code: '+98', country: 'Irán', flag: '🇮🇷' },
+  { code: '+53', country: 'Cuba', flag: '🇨🇺', minLength: 8, maxLength: 8 },
+  { code: '+1', country: 'Estados Unidos/Canadá', flag: '🇺🇸', minLength: 10, maxLength: 10 },
+  { code: '+52', country: 'México', flag: '🇲🇽', minLength: 10, maxLength: 10 },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷', minLength: 10, maxLength: 11 },
+  { code: '+55', country: 'Brasil', flag: '🇧🇷', minLength: 10, maxLength: 11 },
+  { code: '+56', country: 'Chile', flag: '🇨🇱', minLength: 8, maxLength: 9 },
+  { code: '+57', country: 'Colombia', flag: '🇨🇴', minLength: 10, maxLength: 10 },
+  { code: '+58', country: 'Venezuela', flag: '🇻🇪', minLength: 10, maxLength: 10 },
+  { code: '+34', country: 'España', flag: '🇪🇸', minLength: 9, maxLength: 9 },
+  { code: '+33', country: 'Francia', flag: '🇫🇷', minLength: 10, maxLength: 10 },
+  { code: '+39', country: 'Italia', flag: '🇮🇹', minLength: 10, maxLength: 10 },
+  { code: '+49', country: 'Alemania', flag: '🇩🇪', minLength: 10, maxLength: 12 },
+  { code: '+44', country: 'Reino Unido', flag: '🇬🇧', minLength: 10, maxLength: 10 },
+  { code: '+7', country: 'Rusia', flag: '🇷🇺', minLength: 10, maxLength: 10 },
+  { code: '+86', country: 'China', flag: '🇨🇳', minLength: 11, maxLength: 11 },
+  { code: '+81', country: 'Japón', flag: '🇯🇵', minLength: 10, maxLength: 11 },
+  { code: '+82', country: 'Corea del Sur', flag: '🇰🇷', minLength: 10, maxLength: 11 },
+  { code: '+91', country: 'India', flag: '🇮🇳', minLength: 10, maxLength: 10 },
 ];
+
+// ICONOS PARA PRODUCTOS POR CATEGORÍA
+export const PRODUCT_CATEGORY_ICONS = {
+  'laptop': '💻',
+  'tv': '📺',
+  'smartwatch': '⌚',
+  'earphone': '🎧',
+  'mobile': '📱',
+  'smartphone': '📱',
+  'tablet': '📱',
+  'computer': '💻',
+  'monitor': '🖥️',
+  'keyboard': '⌨️',
+  'mouse': '🖱️',
+  'speaker': '🔊',
+  'camera': '📷',
+  'gaming': '🎮',
+  'accessories': '🔌',
+  'default': '📦'
+};
+
+// CONSTANTES DE MONEDA
+export const CURRENCIES = {
+  CUP: {
+    code: 'CUP',
+    name: 'Peso Cubano',
+    symbol: '$',
+    flag: '🇨🇺',
+    rate: 1,
+  },
+  USD: {
+    code: 'USD',
+    name: 'Dólar Estadounidense',
+    symbol: '$',
+    flag: '🇺🇸',
+    rate: 400,
+  },
+  EUR: {
+    code: 'EUR',
+    name: 'Euro',
+    symbol: '€',
+    flag: '🇪🇺',
+    rate: 450,
+  },
+  MLC: {
+    code: 'MLC',
+    name: 'Moneda Libremente Convertible',
+    symbol: 'MLC',
+    flag: '🏦',
+    rate: 200,
+  },
+};
+
+export const DEFAULT_CURRENCY = 'CUP';
+
+// TIPOS DE PAGO
+export const PAYMENT_TYPES = {
+  CASH: 'cash',
+  TRANSFER: 'transfer',
+  BOTH: 'both'
+};
+
+// CONFIGURACIÓN DE TRANSFERENCIA BANCARIA
+export const TRANSFER_CONFIG = {
+  DEFAULT_FEE_PERCENTAGE: 5, // 5% por defecto
+  MIN_FEE_PERCENTAGE: 0,
+  MAX_FEE_PERCENTAGE: 20
+};

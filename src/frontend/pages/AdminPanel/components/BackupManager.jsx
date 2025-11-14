@@ -12,6 +12,19 @@ const BackupManager = () => {
 
   // Función para generar el contenido de constants.jsx actualizado
   const generateConstantsFile = () => {
+    // Obtener datos actualizados desde localStorage
+    const savedConfig = localStorage.getItem('adminStoreConfig');
+    let finalStoreConfig = storeConfig;
+    
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        finalStoreConfig = parsedConfig;
+      } catch (error) {
+        console.error('Error al cargar configuración guardada:', error);
+      }
+    }
+
     const constantsContent = `import { AiFillGithub, AiFillLinkedin, AiOutlineTwitter } from 'react-icons/ai';
 import { v4 as uuid } from 'uuid';
 
@@ -50,8 +63,8 @@ export const SORT_TYPE = {
 export const RATINGS = [4, 3, 2, 1];
 
 export const TEST_USER = {
-  email: 'jethalal.gada@gmail.com',
-  password: 'babitaji1234',
+  email: 'yero.shop@gmail.com',
+  password: 'yeroi1234',
 };
 
 export const SUPER_ADMIN = {
@@ -68,6 +81,7 @@ export const LOCAL_STORAGE_KEYS = {
   User: 'user',
   Token: 'token',
   StoreConfig: 'storeConfig',
+  Currency: 'selectedCurrency',
 };
 
 export const LOGIN_CLICK_TYPE = {
@@ -124,10 +138,10 @@ export const SERVICE_TYPES = {
 };
 
 // Zonas de Santiago de Cuba con costos de entrega - ACTUALIZADAS
-export const SANTIAGO_ZONES = ${JSON.stringify(storeConfig.zones || [], null, 2)};
+export const SANTIAGO_ZONES = ${JSON.stringify(finalStoreConfig.zones || [], null, 2)};
 
 // Cupones de descuento - ACTUALIZADOS
-export const COUPONS = ${JSON.stringify(storeConfig.coupons || [], null, 2)};
+export const COUPONS = ${JSON.stringify(finalStoreConfig.coupons || [], null, 2)};
 
 export const CHARGE_AND_DISCOUNT = {
   deliveryCharge: 0,
@@ -138,89 +152,148 @@ export const MIN_DISTANCE_BETWEEN_THUMBS = 1000;
 export const MAX_RESPONSES_IN_CACHE_TO_STORE = 50;
 
 // WhatsApp de la tienda - ACTUALIZADO
-export const STORE_WHATSAPP = '${storeConfig.storeInfo?.whatsappNumber || '+53 54690878'}';
+export const STORE_WHATSAPP = '${finalStoreConfig.storeInfo?.whatsappNumber || '+53 54690878'}';
 
 // Configuración por defecto de la tienda - ACTUALIZADA
-export const DEFAULT_STORE_CONFIG = ${JSON.stringify(storeConfig.storeInfo || {
-  storeName: 'Gada Electronics',
-  whatsappNumber: '+53 54690878',
+export const DEFAULT_STORE_CONFIG = ${JSON.stringify({
+  storeName: finalStoreConfig.storeInfo?.storeName || 'Yero Shop!',
+  whatsappNumber: finalStoreConfig.storeInfo?.whatsappNumber || '+53 54690878',
   storeAddress: 'Santiago de Cuba, Cuba',
   lastModified: new Date().toISOString(),
   version: '1.0.0'
 }, null, 2)};
 
+// CÓDIGOS DE PAÍSES ACTUALIZADOS CON CUBA INCLUIDO
 export const COUNTRY_CODES = [
-  { code: '+1', country: 'Estados Unidos/Canadá', flag: '🇺🇸' },
-  { code: '+7', country: 'Rusia', flag: '🇷🇺' },
-  { code: '+20', country: 'Egipto', flag: '🇪🇬' },
-  { code: '+27', country: 'Sudáfrica', flag: '🇿🇦' },
-  { code: '+30', country: 'Grecia', flag: '🇬🇷' },
-  { code: '+31', country: 'Países Bajos', flag: '🇳🇱' },
-  { code: '+32', country: 'Bélgica', flag: '🇧🇪' },
-  { code: '+33', country: 'Francia', flag: '🇫🇷' },
-  { code: '+34', country: 'España', flag: '🇪🇸' },
-  { code: '+36', country: 'Hungría', flag: '🇭🇺' },
-  { code: '+39', country: 'Italia', flag: '🇮🇹' },
-  { code: '+40', country: 'Rumania', flag: '🇷🇴' },
-  { code: '+41', country: 'Suiza', flag: '🇨🇭' },
-  { code: '+43', country: 'Austria', flag: '🇦🇹' },
-  { code: '+44', country: 'Reino Unido', flag: '🇬🇧' },
-  { code: '+45', country: 'Dinamarca', flag: '🇩🇰' },
-  { code: '+46', country: 'Suecia', flag: '🇸🇪' },
-  { code: '+47', country: 'Noruega', flag: '🇳🇴' },
-  { code: '+48', country: 'Polonia', flag: '🇵🇱' },
-  { code: '+49', country: 'Alemania', flag: '🇩🇪' },
-  { code: '+51', country: 'Perú', flag: '🇵🇪' },
-  { code: '+52', country: 'México', flag: '🇲🇽' },
-  { code: '+53', country: 'Cuba', flag: '🇨🇺' },
-  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
-  { code: '+55', country: 'Brasil', flag: '🇧🇷' },
-  { code: '+56', country: 'Chile', flag: '🇨🇱' },
-  { code: '+57', country: 'Colombia', flag: '🇨🇴' },
-  { code: '+58', country: 'Venezuela', flag: '🇻🇪' },
-  { code: '+60', country: 'Malasia', flag: '🇲🇾' },
-  { code: '+61', country: 'Australia', flag: '🇦🇺' },
-  { code: '+62', country: 'Indonesia', flag: '🇮🇩' },
-  { code: '+63', country: 'Filipinas', flag: '🇵🇭' },
-  { code: '+64', country: 'Nueva Zelanda', flag: '🇳🇿' },
-  { code: '+65', country: 'Singapur', flag: '🇸🇬' },
-  { code: '+66', country: 'Tailandia', flag: '🇹🇭' },
-  { code: '+81', country: 'Japón', flag: '🇯🇵' },
-  { code: '+82', country: 'Corea del Sur', flag: '🇰🇷' },
-  { code: '+84', country: 'Vietnam', flag: '🇻🇳' },
-  { code: '+86', country: 'China', flag: '🇨🇳' },
-  { code: '+90', country: 'Turquía', flag: '🇹🇷' },
-  { code: '+91', country: 'India', flag: '🇮🇳' },
-  { code: '+92', country: 'Pakistán', flag: '🇵🇰' },
-  { code: '+93', country: 'Afganistán', flag: '🇦🇫' },
-  { code: '+94', country: 'Sri Lanka', flag: '🇱🇰' },
-  { code: '+95', country: 'Myanmar', flag: '🇲🇲' },
-  { code: '+98', country: 'Irán', flag: '🇮🇷' },
+  { code: '+53', country: 'Cuba', flag: '🇨🇺', minLength: 8, maxLength: 8 },
+  { code: '+1', country: 'Estados Unidos/Canadá', flag: '🇺🇸', minLength: 10, maxLength: 10 },
+  { code: '+52', country: 'México', flag: '🇲🇽', minLength: 10, maxLength: 10 },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷', minLength: 10, maxLength: 11 },
+  { code: '+55', country: 'Brasil', flag: '🇧🇷', minLength: 10, maxLength: 11 },
+  { code: '+56', country: 'Chile', flag: '🇨🇱', minLength: 8, maxLength: 9 },
+  { code: '+57', country: 'Colombia', flag: '🇨🇴', minLength: 10, maxLength: 10 },
+  { code: '+58', country: 'Venezuela', flag: '🇻🇪', minLength: 10, maxLength: 10 },
+  { code: '+34', country: 'España', flag: '🇪🇸', minLength: 9, maxLength: 9 },
+  { code: '+33', country: 'Francia', flag: '🇫🇷', minLength: 10, maxLength: 10 },
+  { code: '+39', country: 'Italia', flag: '🇮🇹', minLength: 10, maxLength: 10 },
+  { code: '+49', country: 'Alemania', flag: '🇩🇪', minLength: 10, maxLength: 12 },
+  { code: '+44', country: 'Reino Unido', flag: '🇬🇧', minLength: 10, maxLength: 10 },
+  { code: '+7', country: 'Rusia', flag: '🇷🇺', minLength: 10, maxLength: 10 },
+  { code: '+86', country: 'China', flag: '🇨🇳', minLength: 11, maxLength: 11 },
+  { code: '+81', country: 'Japón', flag: '🇯🇵', minLength: 10, maxLength: 11 },
+  { code: '+82', country: 'Corea del Sur', flag: '🇰🇷', minLength: 10, maxLength: 11 },
+  { code: '+91', country: 'India', flag: '🇮🇳', minLength: 10, maxLength: 10 },
 ];
+
+// ICONOS PARA PRODUCTOS POR CATEGORÍA
+export const PRODUCT_CATEGORY_ICONS = {
+  'laptop': '💻',
+  'tv': '📺',
+  'smartwatch': '⌚',
+  'earphone': '🎧',
+  'mobile': '📱',
+  'smartphone': '📱',
+  'tablet': '📱',
+  'computer': '💻',
+  'monitor': '🖥️',
+  'keyboard': '⌨️',
+  'mouse': '🖱️',
+  'speaker': '🔊',
+  'camera': '📷',
+  'gaming': '🎮',
+  'accessories': '🔌',
+  'default': '📦'
+};
+
+// CONSTANTES DE MONEDA
+export const CURRENCIES = {
+  CUP: {
+    code: 'CUP',
+    name: 'Peso Cubano',
+    symbol: '$',
+    flag: '🇨🇺',
+    rate: 1,
+  },
+  USD: {
+    code: 'USD',
+    name: 'Dólar Estadounidense',
+    symbol: '$',
+    flag: '🇺🇸',
+    rate: 320,
+  },
+  EUR: {
+    code: 'EUR',
+    name: 'Euro',
+    symbol: '€',
+    flag: '🇪🇺',
+    rate: 340,
+  },
+  MLC: {
+    code: 'MLC',
+    name: 'Moneda Libremente Convertible',
+    symbol: 'MLC',
+    flag: '🏦',
+    rate: 270,
+  },
+};
+
+export const DEFAULT_CURRENCY = 'CUP';
 `;
     return constantsContent;
   };
 
-  // Función para generar el contenido de products.js actualizado
+  // Función para generar el contenido de products.js actualizado con estructura exacta
   const generateProductsFile = () => {
+    // Obtener productos actualizados desde localStorage o contexto
+    const savedConfig = localStorage.getItem('adminStoreConfig');
+    let productsToExport = products || [];
+    
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        if (parsedConfig.products && parsedConfig.products.length > 0) {
+          productsToExport = parsedConfig.products;
+        }
+      } catch (error) {
+        console.error('Error al cargar productos guardados:', error);
+      }
+    }
+
+    // Mantener estructura exacta del archivo original con imágenes responsivas
     const productsContent = `/**
  * Product Database can be added here.
  * You can add products of your wish with different attributes
  * */
 
-export const products = ${JSON.stringify(products || [], null, 2)};
+export const products = ${JSON.stringify(productsToExport, null, 2)};
 `;
     return productsContent;
   };
 
-  // Función para generar el contenido de categories.js actualizado
+  // Función para generar el contenido de categories.js actualizado con estructura exacta
   const generateCategoriesFile = () => {
+    // Obtener categorías actualizadas desde localStorage o contexto
+    const savedConfig = localStorage.getItem('adminStoreConfig');
+    let categoriesToExport = categories || [];
+    
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        if (parsedConfig.categories && parsedConfig.categories.length > 0) {
+          categoriesToExport = parsedConfig.categories;
+        }
+      } catch (error) {
+        console.error('Error al cargar categorías guardadas:', error);
+      }
+    }
+
+    // Mantener estructura exacta del archivo original con imágenes responsivas
     const categoriesContent = `/**
  * Category Database can be added here.
  * You can add category of your wish with different attributes
  * */
 
-export const categories = ${JSON.stringify(categories || [], null, 2)};
+export const categories = ${JSON.stringify(categoriesToExport, null, 2)};
 `;
     return categoriesContent;
   };
@@ -255,7 +328,7 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       // Simular proceso de exportación
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Crear archivos actualizados
+      // Crear archivos actualizados con estructura exacta y imágenes responsivas
       const files = [
         {
           name: 'constants.jsx',
@@ -287,7 +360,7 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       const backupFolder = zip.folder('backup');
       const timestamp = new Date().toISOString().split('T')[0];
       
-      // Agregar archivos al ZIP
+      // Agregar archivos al ZIP manteniendo estructura exacta
       files.forEach(file => {
         const folderPath = file.path.replace('src/', '');
         const folder = backupFolder.folder(folderPath);
@@ -295,14 +368,32 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       });
 
       // Agregar archivo de configuración JSON completo
-      const fullConfig = {
+      const savedConfig = localStorage.getItem('adminStoreConfig');
+      const savedMessages = localStorage.getItem('storeMessages');
+      let fullConfig = {
         storeConfig,
         products,
         categories,
-        messages: JSON.parse(localStorage.getItem('storeMessages') || '{}'),
+        messages: savedMessages ? JSON.parse(savedMessages) : {},
         exportDate: new Date().toISOString(),
-        version: '2.0.0'
+        version: '2.1.0'
       };
+
+      // Si hay configuración guardada, usarla
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          fullConfig = {
+            ...fullConfig,
+            ...parsedConfig,
+            messages: savedMessages ? JSON.parse(savedMessages) : fullConfig.messages,
+            exportDate: new Date().toISOString(),
+            version: '2.1.0'
+          };
+        } catch (error) {
+          console.error('Error al cargar configuración guardada:', error);
+        }
+      }
       
       backupFolder.file('full-config.json', JSON.stringify(fullConfig, null, 2));
 
@@ -311,7 +402,7 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       const url = URL.createObjectURL(content);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `gada-electronics-backup-${timestamp}.zip`;
+      link.download = `yero-shop-backup-${timestamp}.zip`;
       
       document.body.appendChild(link);
       link.click();
@@ -319,8 +410,8 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
       
       URL.revokeObjectURL(url);
       
-      toastHandler(ToastType.Success, '🎉 Backup exportado exitosamente a la carpeta backup');
-      toastHandler(ToastType.Info, 'Los archivos han sido actualizados con todos los cambios realizados en el panel');
+      toastHandler(ToastType.Success, '🎉 Backup de Yero Shop exportado exitosamente');
+      toastHandler(ToastType.Info, 'Los archivos mantienen la estructura exacta con sincronización completa');
       
     } catch (error) {
       console.error('Error al exportar backup:', error);
@@ -330,9 +421,38 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
     }
   };
 
+  // Obtener estadísticas actualizadas
+  const getStats = () => {
+    const savedConfig = localStorage.getItem('adminStoreConfig');
+    let stats = {
+      products: products?.length || 0,
+      categories: categories?.length || 0,
+      coupons: storeConfig.coupons?.length || 0,
+      zones: storeConfig.zones?.length || 0
+    };
+
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        stats = {
+          products: parsedConfig.products?.length || stats.products,
+          categories: parsedConfig.categories?.length || stats.categories,
+          coupons: parsedConfig.coupons?.length || stats.coupons,
+          zones: parsedConfig.zones?.length || stats.zones
+        };
+      } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+      }
+    }
+
+    return stats;
+  };
+
+  const stats = getStats();
+
   return (
     <div className={styles.backupManager}>
-      <h2>🗂️ Sistema de Backup Completo</h2>
+      <h2>🗂️ Sistema de Backup Completo - <span className="yero-shop-text">Yero Shop!</span></h2>
       
       <div className={styles.infoSection}>
         <h3>ℹ️ Información del Sistema de Backup</h3>
@@ -340,21 +460,27 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
           <div className={styles.infoItem}>
             <strong>📁 Archivos incluidos:</strong>
             <ul>
-              <li><code>constants.jsx</code> - Configuración de cupones, zonas y WhatsApp</li>
-              <li><code>products.js</code> - Base de datos de productos actualizada</li>
-              <li><code>categories.js</code> - Base de datos de categorías actualizada</li>
+              <li><code>constants.jsx</code> - Configuración de cupones, zonas, WhatsApp y monedas</li>
+              <li><code>products.js</code> - Base de datos de productos con estructura exacta e imágenes responsivas</li>
+              <li><code>categories.js</code> - Base de datos de categorías con estructura exacta e imágenes responsivas</li>
               <li><code>messages.js</code> - Todos los mensajes de la tienda</li>
               <li><code>full-config.json</code> - Configuración completa en JSON</li>
             </ul>
           </div>
           <div className={styles.infoItem}>
-            <strong>🔄 Proceso de backup:</strong> Todos los cambios realizados en el panel se exportan a archivos actualizados manteniendo la estructura original del código fuente.
+            <strong>🔄 Proceso de backup:</strong> Todos los cambios realizados en el panel se exportan manteniendo la estructura exacta de los archivos originales con imágenes optimizadas.
           </div>
           <div className={styles.infoItem}>
             <strong>📦 Formato:</strong> Los archivos se exportan en un archivo ZIP organizado por carpetas según la estructura del proyecto.
           </div>
           <div className={styles.infoItem}>
+            <strong>🖼️ Imágenes responsivas:</strong> Las imágenes se mantienen en el tamaño actual: productos (600x450px), categorías (400x300px) para móviles, tablets y PC.
+          </div>
+          <div className={styles.infoItem}>
             <strong>🛡️ Seguridad:</strong> Mantiene la integridad del código fuente y permite restaurar fácilmente los cambios.
+          </div>
+          <div className={styles.infoItem}>
+            <strong>💱 Monedas:</strong> Incluye todas las constantes de moneda necesarias para el sistema de conversión.
           </div>
         </div>
       </div>
@@ -367,16 +493,21 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
           <div className={styles.cardContent}>
             <p>
               Exporta todos los cambios realizados en el panel de control a archivos de código fuente 
-              actualizados. Esto incluye productos, categorías, cupones, zonas, mensajes y configuraciones.
+              actualizados manteniendo la estructura exacta con imágenes optimizadas. Esto incluye productos, categorías, cupones, zonas, mensajes, configuraciones y sistema de monedas.
             </p>
             <div className={styles.changesSummary}>
               <h4>📊 Resumen de cambios a exportar:</h4>
               <ul>
-                <li>🎫 {storeConfig.coupons?.length || 0} cupones configurados</li>
-                <li>📍 {storeConfig.zones?.length || 0} zonas de entrega</li>
-                <li>📦 {products?.length || 0} productos en catálogo</li>
-                <li>📂 {categories?.length || 0} categorías disponibles</li>
-                <li>💬 {Object.keys(JSON.parse(localStorage.getItem('storeMessages') || '{}')).length} categorías de mensajes</li>
+                <li>🎫 {stats.coupons} cupones configurados</li>
+                <li>📍 {stats.zones} zonas de entrega</li>
+                <li>📦 {stats.products} productos en catálogo (con imágenes 600x450px responsivas)</li>
+                <li>📂 {stats.categories} categorías disponibles (con imágenes 400x300px responsivas)</li>
+                <li>💬 {Object.keys(JSON.parse(localStorage.getItem('storeMessages') || '{}')).length} categorías de mensajes sincronizados</li>
+                <li>💱 Sistema completo de monedas (CUP, USD, EUR, MLC)</li>
+                <li>🔄 Sincronización en tiempo real entre todas las secciones</li>
+                <li>💳 Configuración de métodos de pago por producto</li>
+                <li>🎫 Control de cupones por producto</li>
+                <li>⚙️ Configuración general de la tienda</li>
               </ul>
             </div>
             <button 
@@ -409,19 +540,19 @@ export const STORE_MESSAGES = ${JSON.stringify(messages, null, 2)};
           <div className={styles.step}>
             <span className={styles.stepNumber}>2</span>
             <div className={styles.stepContent}>
-              <strong>Exportar backup:</strong> Haz clic en "Exportar Backup Completo" para generar los archivos actualizados.
+              <strong>Verificar sincronización:</strong> Los cambios se sincronizan automáticamente entre todas las secciones del panel y se aplican en tiempo real en la tienda.
             </div>
           </div>
           <div className={styles.step}>
             <span className={styles.stepNumber}>3</span>
             <div className={styles.stepContent}>
-              <strong>Descargar archivos:</strong> Se descargará un archivo ZIP con todos los archivos de código fuente actualizados.
+              <strong>Exportar backup:</strong> Haz clic en "Exportar Backup Completo" para generar los archivos actualizados con sincronización completa.
             </div>
           </div>
           <div className={styles.step}>
             <span className={styles.stepNumber}>4</span>
             <div className={styles.stepContent}>
-              <strong>Aplicar cambios:</strong> Extrae los archivos del ZIP y reemplaza los archivos correspondientes en tu proyecto.
+              <strong>Aplicar cambios:</strong> Extrae los archivos del ZIP y reemplaza los archivos correspondientes en tu proyecto. Todos los cambios están sincronizados.
             </div>
           </div>
         </div>

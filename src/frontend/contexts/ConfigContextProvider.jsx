@@ -12,6 +12,7 @@ const ConfigContextProvider = ({ children }) => {
     coupons: COUPONS,
     zones: SANTIAGO_ZONES,
     products: [],
+    categories: [],
     lastModified: new Date().toISOString()
   });
 
@@ -48,6 +49,16 @@ const ConfigContextProvider = ({ children }) => {
       lastModified: new Date().toISOString()
     };
     saveConfig(updatedConfig);
+    
+    // Disparar eventos de sincronización
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('couponsUpdated', { 
+        detail: { coupons: newCoupons } 
+      }));
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'coupons', data: newCoupons } 
+      }));
+    }, 10);
   };
 
   // Actualizar zonas
@@ -58,6 +69,16 @@ const ConfigContextProvider = ({ children }) => {
       lastModified: new Date().toISOString()
     };
     saveConfig(updatedConfig);
+    
+    // Disparar eventos de sincronización
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('zonesUpdated', { 
+        detail: { zones: newZones } 
+      }));
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'zones', data: newZones } 
+      }));
+    }, 10);
   };
 
   // Actualizar información de la tienda
@@ -68,16 +89,70 @@ const ConfigContextProvider = ({ children }) => {
       lastModified: new Date().toISOString()
     };
     saveConfig(updatedConfig);
+    
+    // Disparar eventos de sincronización
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('storeInfoUpdated', { 
+        detail: { storeInfo: newStoreInfo } 
+      }));
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'storeInfo', data: newStoreInfo } 
+      }));
+    }, 10);
   };
 
-  // Actualizar productos
+  // Actualizar productos - MEJORADA PARA MANTENER ESTRUCTURA EXACTA
   const updateProducts = (newProducts) => {
     const updatedConfig = {
       ...storeConfig,
       products: newProducts,
       lastModified: new Date().toISOString()
     };
-    saveConfig(updatedConfig);
+    
+    // Guardar en localStorage manteniendo estructura exacta
+    setStoreConfig(updatedConfig);
+    localStorage.setItem('adminStoreConfig', JSON.stringify(updatedConfig));
+    
+    // Disparar evento para sincronización global
+    window.dispatchEvent(new CustomEvent('productsConfigUpdated', { 
+      detail: { products: newProducts } 
+    }));
+    
+    // Sincronización adicional
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'products', data: newProducts } 
+      }));
+    }, 10);
+    
+    toastHandler(ToastType.Success, 'Productos actualizados en la configuración');
+  };
+
+  // Actualizar categorías - MEJORADA PARA MANTENER ESTRUCTURA EXACTA
+  const updateCategories = (newCategories) => {
+    const updatedConfig = {
+      ...storeConfig,
+      categories: newCategories,
+      lastModified: new Date().toISOString()
+    };
+    
+    // Guardar en localStorage manteniendo estructura exacta
+    setStoreConfig(updatedConfig);
+    localStorage.setItem('adminStoreConfig', JSON.stringify(updatedConfig));
+    
+    // Disparar evento para sincronización global
+    window.dispatchEvent(new CustomEvent('categoriesConfigUpdated', { 
+      detail: { categories: newCategories } 
+    }));
+    
+    // Sincronización adicional
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'categories', data: newCategories } 
+      }));
+    }, 10);
+    
+    toastHandler(ToastType.Success, 'Categorías actualizadas en la configuración');
   };
 
   // Exportar configuración
@@ -136,6 +211,7 @@ const ConfigContextProvider = ({ children }) => {
       coupons: COUPONS,
       zones: SANTIAGO_ZONES,
       products: [],
+      categories: [],
       lastModified: new Date().toISOString()
     };
     
@@ -150,6 +226,7 @@ const ConfigContextProvider = ({ children }) => {
       updateZones,
       updateStoreInfo,
       updateProducts,
+      updateCategories,
       exportConfiguration,
       importConfiguration,
       resetConfiguration,

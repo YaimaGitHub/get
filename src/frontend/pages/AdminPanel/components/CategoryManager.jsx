@@ -3,10 +3,12 @@ import { v4 as uuid } from 'uuid';
 import { toastHandler } from '../../../utils/utils';
 import { ToastType } from '../../../constants/constants';
 import { useAllProductsContext } from '../../../contexts/ProductsContextProvider';
+import { useConfigContext } from '../../../contexts/ConfigContextProvider';
 import styles from './CategoryManager.module.css';
 
 const CategoryManager = () => {
-  const { categories: categoriesFromContext } = useAllProductsContext();
+  const { categories: categoriesFromContext, updateCategoriesFromAdmin } = useAllProductsContext();
+  const { updateCategories } = useConfigContext();
   const [localCategories, setLocalCategories] = useState([]);
   const [editingCategory, setEditingCategory] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -20,10 +22,118 @@ const CategoryManager = () => {
 
   const [categoryForm, setCategoryForm] = useState(initialCategoryState);
 
-  // Cargar categorías desde el contexto
+  // CARGAR CATEGORÍAS CON SINCRONIZACIÓN MEJORADA
   useEffect(() => {
-    setLocalCategories(categoriesFromContext || []);
-  }, [categoriesFromContext]);
+    console.log('🔄 Cargando categorías en CategoryManager:', categoriesFromContext?.length || 0);
+    
+    // Cargar desde el contexto primero
+    if (categoriesFromContext && categoriesFromContext.length > 0) {
+      setLocalCategories(categoriesFromContext);
+    } else {
+      // Si no hay categorías en el contexto, intentar cargar desde localStorage
+      const savedConfig = localStorage.getItem('adminStoreConfig');
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          if (parsedConfig.categories && parsedConfig.categories.length > 0) {
+            console.log('📦 Cargando categorías desde localStorage:', parsedConfig.categories.length);
+            setLocalCategories(parsedConfig.categories);
+            // Sincronizar con el contexto
+            updateCategoriesFromAdmin(parsedConfig.categories);
+          }
+        } catch (error) {
+          console.error('Error al cargar categorías desde localStorage:', error);
+        }
+      }
+    }
+  }, [categoriesFromContext, updateCategoriesFromAdmin]);
+
+  // ESCUCHAR EVENTOS DE ACTUALIZACIÓN DE CATEGORÍAS
+  useEffect(() => {
+    const handleCategoriesUpdate = (event) => {
+      const { categories: updatedCategories } = event.detail;
+      console.log('📡 Evento de actualización de categorías recibido en CategoryManager');
+      setLocalCategories(updatedCategories);
+    };
+
+    const handleConfigUpdate = () => {
+      console.log('📡 Evento de actualización de configuración recibido en CategoryManager');
+      const savedConfig = localStorage.getItem('adminStoreConfig');
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          if (parsedConfig.categories) {
+            setLocalCategories(parsedConfig.categories);
+          }
+        } catch (error) {
+          console.error('Error al cargar categorías desde configuración:', error);
+        }
+      }
+    };
+
+    // Agregar listeners
+    window.addEventListener('categoriesUpdated', handleCategoriesUpdate);
+    window.addEventListener('categoriesConfigUpdated', handleCategoriesUpdate);
+    window.addEventListener('forceStoreUpdate', handleConfigUpdate);
+    window.addEventListener('adminConfigChanged', handleConfigUpdate);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('categoriesUpdated', handleCategoriesUpdate);
+      window.removeEventListener('categoriesConfigUpdated', handleCategoriesUpdate);
+      window.removeEventListener('forceStoreUpdate', handleConfigUpdate);
+      window.removeEventListener('adminConfigChanged', handleConfigUpdate);
+    };
+  }, []);
+
+  // FUNCIÓN PARA MANTENER EL TAMAÑO ACTUAL DE LAS IMÁGENES (RESPONSIVO)
+  const resizeImageToCurrentSize = (file, callback) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // MANTENER EL TAMAÑO ACTUAL DE LAS CATEGORÍAS EXISTENTES
+      // Analizando las imágenes actuales, mantienen proporción 4:3 responsiva
+      const targetWidth = 400;  // Tamaño actual de las categorías
+      const targetHeight = 300; // Proporción 4:3 como las actuales
+      
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      
+      // Calcular dimensiones manteniendo proporción
+      const aspectRatio = img.width / img.height;
+      let drawWidth = targetWidth;
+      let drawHeight = targetHeight;
+      let offsetX = 0;
+      let offsetY = 0;
+      
+      if (aspectRatio > targetWidth/targetHeight) {
+        drawHeight = targetWidth / aspectRatio;
+        offsetY = (targetHeight - drawHeight) / 2;
+      } else {
+        drawWidth = targetHeight * aspectRatio;
+        offsetX = (targetWidth - drawWidth) / 2;
+      }
+      
+      // Fondo blanco para mejor contraste (como las actuales)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, targetWidth, targetHeight);
+      
+      // Dibujar imagen centrada y redimensionada
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      
+      // Convertir a base64 con buena calidad (como las actuales)
+      const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      callback(resizedDataUrl);
+    };
+    
+    img.onerror = () => {
+      toastHandler(ToastType.Error, 'Error al procesar la imagen');
+    };
+    
+    img.src = URL.createObjectURL(file);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,16 +147,27 @@ const CategoryManager = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setCategoryForm(prev => ({ ...prev, categoryImage: e.target.result }));
+      // Validar que sea una imagen
+      if (!file.type.startsWith('image/')) {
+        toastHandler(ToastType.Error, 'Por favor selecciona un archivo de imagen válido');
+        return;
+      }
+      
+      // Validar tamaño (máximo 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toastHandler(ToastType.Error, 'La imagen debe ser menor a 10MB');
+        return;
+      }
+      
+      // Redimensionar imagen manteniendo el tamaño actual
+      resizeImageToCurrentSize(file, (resizedDataUrl) => {
+        setCategoryForm(prev => ({ ...prev, categoryImage: resizedDataUrl }));
         setHasUnsavedChanges(true);
-      };
-      reader.readAsDataURL(file);
+        toastHandler(ToastType.Success, 'Imagen optimizada manteniendo el tamaño actual de las categorías');
+      });
     }
   };
 
-  // GUARDAR CAMBIOS EN MEMORIA LOCAL (NO EXPORTAR)
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -72,27 +193,118 @@ const CategoryManager = () => {
       return;
     }
 
+    // Crear categoría con estructura exacta de categories.js
     const newCategory = {
-      ...categoryForm,
-      _id: editingCategory ? editingCategory._id : uuid(),
-      categoryName: categoryForm.categoryName.toLowerCase().trim(),
+      "_id": editingCategory ? editingCategory._id : uuid(),
+      "categoryName": categoryForm.categoryName.toLowerCase().trim(),
+      "categoryImage": categoryForm.categoryImage,
+      "description": categoryForm.description || "",
+      "id": editingCategory ? editingCategory.id : (localCategories.length + 1).toString(),
+      "disabled": editingCategory ? editingCategory.disabled : false // Mantener estado o false por defecto
     };
 
     let updatedCategories;
     if (editingCategory) {
       updatedCategories = localCategories.map(c => c._id === editingCategory._id ? newCategory : c);
-      toastHandler(ToastType.Success, '✅ Categoría actualizada (cambios en memoria)');
+      toastHandler(ToastType.Success, '✅ Categoría actualizada exitosamente');
     } else {
       updatedCategories = [...localCategories, newCategory];
-      toastHandler(ToastType.Success, '✅ Categoría creada (cambios en memoria)');
+      toastHandler(ToastType.Success, '✅ Categoría creada exitosamente');
     }
 
-    // SOLO GUARDAR EN MEMORIA LOCAL - NO EXPORTAR
-    setLocalCategories(updatedCategories);
+    // SINCRONIZACIÓN COMPLETA Y INMEDIATA MEJORADA
+    performCompleteSync(updatedCategories);
+    
     resetForm();
+  };
 
-    // Mostrar mensaje informativo
-    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
+  // Función para sincronización completa MEJORADA CON PERSISTENCIA GARANTIZADA
+  const performCompleteSync = (updatedCategories) => {
+    console.log('🔄 Iniciando sincronización completa de categorías...');
+    
+    // 1. Actualizar estado local inmediatamente
+    setLocalCategories(updatedCategories);
+    
+    // 2. Actualizar en localStorage para persistencia inmediata con verificación
+    const savedConfig = localStorage.getItem('adminStoreConfig') || '{}';
+    let config = {};
+    
+    try {
+      config = JSON.parse(savedConfig);
+    } catch (error) {
+      console.error('Error al cargar configuración:', error);
+      config = {};
+    }
+
+    config.categories = updatedCategories;
+    config.lastModified = new Date().toISOString();
+    
+    // Guardar con verificación
+    localStorage.setItem('adminStoreConfig', JSON.stringify(config));
+    
+    // Verificar que se guardó correctamente
+    const verifyConfig = localStorage.getItem('adminStoreConfig');
+    if (verifyConfig) {
+      try {
+        const parsedVerify = JSON.parse(verifyConfig);
+        if (parsedVerify.categories && parsedVerify.categories.length === updatedCategories.length) {
+          console.log('✅ Categorías guardadas correctamente en localStorage');
+        }
+      } catch (error) {
+        console.error('Error en verificación de guardado:', error);
+      }
+    }
+    
+    // 3. Actualizar en el contexto de configuración para backup
+    updateCategories(updatedCategories);
+    
+    // 4. Actualizar en el contexto de productos para sincronización inmediata en la tienda
+    updateCategoriesFromAdmin(updatedCategories);
+    
+    // 5. Disparar eventos de sincronización optimizados
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('categoriesUpdated', { 
+        detail: { categories: updatedCategories } 
+      }));
+      
+      window.dispatchEvent(new CustomEvent('categoriesConfigUpdated', { 
+        detail: { categories: updatedCategories } 
+      }));
+      
+      window.dispatchEvent(new CustomEvent('forceStoreUpdate'));
+      
+      window.dispatchEvent(new CustomEvent('adminConfigChanged', { 
+        detail: { categories: updatedCategories, type: 'categories' } 
+      }));
+      
+      // Sincronizar con otros componentes del admin panel
+      window.dispatchEvent(new CustomEvent('adminPanelSync', { 
+        detail: { type: 'categories', data: updatedCategories } 
+      }));
+      
+      // Sincronizar específicamente con ProductManager
+      window.dispatchEvent(new CustomEvent('categoriesForProductsUpdated', { 
+        detail: { categories: updatedCategories } 
+      }));
+    }, 10);
+
+    // 6. Verificación de sincronización
+    setTimeout(() => {
+      const currentConfig = localStorage.getItem('adminStoreConfig');
+      if (currentConfig) {
+        try {
+          const parsedConfig = JSON.parse(currentConfig);
+          if (parsedConfig.categories && parsedConfig.categories.length === updatedCategories.length) {
+            console.log('✅ Sincronización de categorías verificada exitosamente');
+            toastHandler(ToastType.Info, '🔄 Categorías sincronizadas en tiempo real con productos');
+          }
+        } catch (error) {
+          console.error('Error en verificación de sincronización:', error);
+        }
+      }
+    }, 100);
+
+    console.log('✅ Sincronización de categorías completada');
   };
 
   const resetForm = () => {
@@ -120,23 +332,26 @@ const CategoryManager = () => {
         : c
     );
 
-    setLocalCategories(updatedCategories);
+    // SINCRONIZACIÓN COMPLETA
+    performCompleteSync(updatedCategories);
+    
     const category = localCategories.find(c => c._id === categoryId);
     toastHandler(ToastType.Success, 
-      `✅ Categoría ${category.disabled ? 'habilitada' : 'deshabilitada'} (cambios en memoria)`
+      `✅ Categoría ${category.disabled ? 'habilitada' : 'deshabilitada'} exitosamente`
     );
-    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
   };
 
   const deleteCategory = (categoryId) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta categoría? Los cambios se guardarán en memoria.')) {
+    if (!window.confirm('¿Estás seguro de eliminar esta categoría? Esta acción afectará todos los productos de esta categoría.')) {
       return;
     }
 
     const updatedCategories = localCategories.filter(c => c._id !== categoryId);
-    setLocalCategories(updatedCategories);
-    toastHandler(ToastType.Success, '✅ Categoría eliminada (cambios en memoria)');
-    toastHandler(ToastType.Info, 'Para aplicar los cambios, ve a "💾 Exportar/Importar" y exporta la configuración');
+    
+    // SINCRONIZACIÓN COMPLETA
+    performCompleteSync(updatedCategories);
+    
+    toastHandler(ToastType.Success, '✅ Categoría eliminada exitosamente');
   };
 
   const handleCancel = () => {
@@ -155,11 +370,11 @@ const CategoryManager = () => {
   return (
     <div className={styles.categoryManager}>
       <div className={styles.header}>
-        <h2>Gestión de Categorías</h2>
+        <h2>📂 Gestión de Categorías</h2>
         <div className={styles.headerActions}>
           {hasChanges && (
             <span className={styles.changesIndicator}>
-              🔴 Cambios pendientes
+              🟢 Cambios aplicados en tiempo real
             </span>
           )}
           <button 
@@ -173,7 +388,26 @@ const CategoryManager = () => {
 
       <div className={styles.infoBox}>
         <h4>ℹ️ Información Importante</h4>
-        <p>Los cambios se guardan temporalmente en memoria. Para aplicarlos permanentemente, ve a la sección "💾 Exportar/Importar" y exporta la configuración.</p>
+        <p>Los cambios se aplican automáticamente en la tienda. Las imágenes mantienen el tamaño actual de las categorías existentes (400x300px responsivo). Las categorías deshabilitadas no aparecen en el inicio de la tienda. Para exportar los cambios permanentemente, ve a la sección "🗂️ Sistema Backup".</p>
+      </div>
+
+      {/* INDICADOR DE ESTADO DE CATEGORÍAS */}
+      <div className={styles.statusIndicator}>
+        <h4>📊 Estado Actual de Categorías</h4>
+        <div className={styles.statusGrid}>
+          <div className={styles.statusItem}>
+            <span className={styles.statusNumber}>{localCategories.length}</span>
+            <span className={styles.statusLabel}>Total</span>
+          </div>
+          <div className={styles.statusItem}>
+            <span className={styles.statusNumber}>{localCategories.filter(c => !c.disabled).length}</span>
+            <span className={styles.statusLabel}>Activas</span>
+          </div>
+          <div className={styles.statusItem}>
+            <span className={styles.statusNumber}>{localCategories.filter(c => c.disabled).length}</span>
+            <span className={styles.statusLabel}>Deshabilitadas</span>
+          </div>
+        </div>
       </div>
 
       {showForm && (
@@ -215,7 +449,7 @@ const CategoryManager = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Imagen de la Categoría *</label>
+            <label>Imagen de la Categoría * (Mantiene el tamaño actual: 400x300px responsivo)</label>
             <input
               type="file"
               accept="image/*"
@@ -230,17 +464,19 @@ const CategoryManager = () => {
               onChange={handleInputChange}
               className="form-input"
               placeholder="https://ejemplo.com/imagen.jpg"
+              required
             />
             {categoryForm.categoryImage && (
               <div className={styles.imagePreview}>
                 <img src={categoryForm.categoryImage} alt="Preview" />
+                <small>Tamaño: 400x300px (igual que las categorías actuales)</small>
               </div>
             )}
           </div>
 
           <div className={styles.formActions}>
             <button type="submit" className="btn btn-primary">
-              💾 {editingCategory ? 'Actualizar' : 'Crear'} Categoría (En Memoria)
+              💾 {editingCategory ? 'Actualizar' : 'Crear'} Categoría
             </button>
             <button type="button" onClick={handleCancel} className="btn btn-hipster">
               Cancelar
@@ -254,14 +490,23 @@ const CategoryManager = () => {
           <h3>Categorías Existentes ({localCategories.length})</h3>
           {hasChanges && (
             <div className={styles.changesAlert}>
-              <span>🔴 Hay {Math.abs(localCategories.length - categoriesFromContext.length)} cambios pendientes</span>
-              <small>Ve a "💾 Exportar/Importar" para aplicar los cambios</small>
+              <span>🟢 Los cambios se han aplicado en tiempo real en la tienda</span>
+              <small>Ve a "🗂️ Sistema Backup" para exportar los cambios</small>
             </div>
           )}
         </div>
 
         {localCategories.length === 0 ? (
-          <p className={styles.emptyMessage}>No hay categorías creadas aún.</p>
+          <div className={styles.emptyState}>
+            <h3>📂 No hay categorías creadas</h3>
+            <p>Crea tu primera categoría para organizar los productos de la tienda.</p>
+            <button 
+              className="btn btn-primary"
+              onClick={() => setShowForm(true)}
+            >
+              ➕ Crear Primera Categoría
+            </button>
+          </div>
         ) : (
           <div className={styles.categoriesGrid}>
             {localCategories.map(category => (
@@ -280,7 +525,7 @@ const CategoryManager = () => {
                     <p>{category.description}</p>
                   )}
                   <span className={`${styles.status} ${category.disabled ? styles.statusDisabled : styles.statusActive}`}>
-                    {category.disabled ? 'Deshabilitada' : 'Activa'}
+                    {category.disabled ? 'Deshabilitada (No aparece en tienda)' : 'Activa (Visible en tienda)'}
                   </span>
                 </div>
                 <div className={styles.categoryActions}>

@@ -3,10 +3,40 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no" />
     <meta name="theme-color" content="#000000" />
 
-    <meta name="title" property="og:title" content="Gada Electronics" />
+    <!-- Desactivar zoom en dispositivos Apple -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    
+    <!-- Prevenir zoom automático en inputs en iOS -->
+    <style>
+      @media screen and (-webkit-min-device-pixel-ratio: 0) {
+        select,
+        textarea,
+        input[type="text"],
+        input[type="password"],
+        input[type="datetime"],
+        input[type="datetime-local"],
+        input[type="date"],
+        input[type="month"],
+        input[type="time"],
+        input[type="week"],
+        input[type="number"],
+        input[type="email"],
+        input[type="url"],
+        input[type="search"],
+        input[type="tel"],
+        input[type="color"] {
+          font-size: 16px !important;
+        }
+      }
+    </style>
+
+    <meta name="title" property="og:title" content="Yero Shop!" />
     <meta name="type" property="og:type" content="website" />
     <meta
       name="url"
@@ -16,7 +46,7 @@
     <meta
       name="description"
       property="og:description"
-      content="¡Bienvenido a Gada Electronics! Experimenta la alegría de las compras en línea sin problemas y explora el mundo de la electrónica con nosotros. Comienza a navegar por nuestra vasta colección hoy y eleva tu estilo de vida digital con nuestros productos y servicios excepcionales."
+      content="¡Bienvenido a Yero Shop! Experimenta la alegría de las compras en línea sin problemas y explora el mundo de la electrónica con nosotros. Comienza a navegar por nuestra vasta colección hoy y eleva tu estilo de vida digital con nuestros productos y servicios excepcionales."
     />
 
     <meta
@@ -28,11 +58,11 @@
     <meta property="og:image:height" content="800" />
 
     <!-- favicon -->
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.svg" />
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.svg" />
+    <link rel="icon" type="image/svg" sizes="32x32" href="/favicon-32x32.svg" />
+    <link rel="icon" type="image/svg" sizes="16x16" href="/favicon-16x16.svg" />
     <link rel="manifest" href="/site.webmanifest" />
     <!-- favicon end -->
 
@@ -44,7 +74,7 @@
       rel="stylesheet"
     />
     <!-- fonts import end -->
-    <title>Gada Electronics</title>
+    <title>Yero Shop!</title>
   </head>
   <body>
     <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>

@@ -9,6 +9,7 @@ import {
   FiltersContextProvider,
   ProductsContextProvider,
   ConfigContextProvider,
+  CurrencyContextProvider,
 } from './frontend/contexts';
 
 // Call make Server
@@ -19,13 +20,15 @@ const root = createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthContextProvider>
-      <ConfigContextProvider>
-        <ProductsContextProvider>
-          <FiltersContextProvider>
-            <App />
-          </FiltersContextProvider>
-        </ProductsContextProvider>
-      </ConfigContextProvider>
+      <CurrencyContextProvider>
+        <ConfigContextProvider>
+          <ProductsContextProvider>
+            <FiltersContextProvider>
+              <App />
+            </FiltersContextProvider>
+          </ProductsContextProvider>
+        </ConfigContextProvider>
+      </CurrencyContextProvider>
     </AuthContextProvider>
   </React.StrictMode>
 );

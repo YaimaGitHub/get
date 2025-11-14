@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import { FOOTER_LINKS } from '../../constants/constants';
 import styles from './Footer.module.css';
-import JethaBg from '../../assets/jetha-bg.mp3';
 import useAudio from '../../hooks/useAudio';
 
 const Footer = () => {
   const presentYear = new Date().getFullYear();
-  const handleSoundPausePlay = useAudio({ audioTrack: JethaBg });
+  const handleSoundPausePlay = useAudio({ audioTrack: '/jetha-bg.mp3' });
 
   return (
     <section className={styles.footer}>
@@ -22,7 +21,7 @@ const Footer = () => {
         <span>© {presentYear} </span>
         <div className={styles.jethaDiv}>
           <button onClick={handleSoundPausePlay} className={styles.nameBtn}>
-            Jethalal Gada.
+            <span className="yero-shop-text">Yero Shop!</span>.
           </button>{' '}
           <div className={styles.tooltip}>⚠ Includes Music !!</div>
         </div>

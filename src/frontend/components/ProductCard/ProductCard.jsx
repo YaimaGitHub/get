@@ -14,7 +14,7 @@ import {
 } from '../../utils/utils';
 import { useAllProductsContext } from '../../contexts/ProductsContextProvider';
 import { useAuthContext } from '../../contexts/AuthContextProvider';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -31,8 +31,31 @@ const ProductCard = ({ product }) => {
     removeFromWishlistDispatch,
   } = useAllProductsContext();
 
+  // ESCUCHAR EVENTOS DE SINCRONIZACIÓN PARA ACTUALIZAR PRODUCTOS
+  useEffect(() => {
+    const handleProductSync = (event) => {
+      const { type } = event.detail;
+      if (type === 'products' || type === 'paymentconfig' || type === 'couponproducts') {
+        console.log('📡 Sincronización de productos detectada en ProductCard');
+        // Los productos se actualizarán automáticamente a través del contexto
+      }
+    };
+
+    window.addEventListener('adminPanelSync', handleProductSync);
+
+    return () => {
+      window.removeEventListener('adminPanelSync', handleProductSync);
+    };
+  }, []);
   const { colors, stock } = product;
   const inStock = stock > 0;
+
+  // Obtener información de pago
+  const paymentType = product.paymentType || 'both';
+  const transferFeePercentage = product.transferFeePercentage || 5;
+  
+  // Calcular precio con transferencia para mostrar información completa
+  const transferPrice = product.price * (1 + transferFeePercentage / 100);
 
   const [activeColorObj, setActiveColorObj] = useState(colors[0]);
 
@@ -166,6 +189,22 @@ const ProductCard = ({ product }) => {
             </>
           )}
         </main>
+
+        <div className={styles.paymentInfo}>
+          {paymentType === 'cash' && (
+            <span className={styles.paymentCash}>💰 Solo Efectivo</span>
+          )}
+          {paymentType === 'transfer' && (
+            <span className={styles.paymentTransfer}>
+              💳 Solo Transferencia (+{transferFeePercentage}% = <Price amount={transferPrice} showCurrency={false} />)
+            </span>
+          )}
+          {paymentType === 'both' && (
+            <span className={styles.paymentBoth}>
+              💰💳 Efectivo: <Price amount={product.price} showCurrency={false} /> | Transferencia: <Price amount={transferPrice} showCurrency={false} /> (+{transferFeePercentage}%)
+            </span>
+          )}
+        </div>
 
         <div
           className={

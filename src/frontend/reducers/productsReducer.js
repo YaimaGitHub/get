@@ -11,19 +11,7 @@ export const initialProductsState = {
     totalAmount: 0,
     totalCount: 0,
   },
-  addressList: [
-    {
-      addressId: 'abc',
-      username: 'Swastik Patro',
-      mobile: 9203874811,
-      alternate: 9370818549,
-      city: 'kalyan',
-      state: 'Maharashtra',
-      pincode: 421306,
-      addressInfo: '9133 Kessler Grove Apt. 325',
-    },
-  ],
-  // orderDetails: [],
+  addressList: [],
 };
 
 export const productsReducer = (state, action) => {
@@ -98,6 +86,25 @@ export const productsReducer = (state, action) => {
       };
     }
 
+    // ACCIONES MEJORADAS PARA SINCRONIZACIÓN COMPLETA
+    case PRODUCTS_ACTION.UPDATE_PRODUCTS_FROM_ADMIN:
+    case PRODUCTS_ACTION.FORCE_UPDATE_PRODUCTS: {
+      console.log('🔄 Actualizando productos en reducer:', action.payload.products.length);
+      return {
+        ...state,
+        products: [...action.payload.products],
+      };
+    }
+
+    case PRODUCTS_ACTION.UPDATE_CATEGORIES_FROM_ADMIN:
+    case PRODUCTS_ACTION.FORCE_UPDATE_CATEGORIES: {
+      console.log('🔄 Actualizando categorías en reducer:', action.payload.categories.length);
+      return {
+        ...state,
+        categories: [...action.payload.categories],
+      };
+    }
+
     case PRODUCTS_ACTION.ADD_ADDRESS: {
       return {
         ...state,
@@ -138,13 +145,6 @@ export const productsReducer = (state, action) => {
         addressList: [],
       };
     }
-
-    // case PRODUCTS_ACTION.ADD_ORDER: {
-    //   return {
-    //     ...state,
-    //     orderDetails: state.orderDetails.concat(action.payload.order),
-    //   };
-    // }
 
     default:
       throw new Error(`${action.type} does not exist`);

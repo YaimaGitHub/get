@@ -97,7 +97,12 @@ const SingleProductPage = () => {
     stock,
     reviewCount,
     stars,
+    paymentType,
+    transferFeePercentage,
   } = singleProductData;
+  
+  // Calcular precio con transferencia para mostrar información completa
+  const transferPrice = price * (1 + transferFeePercentage / 100);
 
   const discountPercent = calculateDiscountPercent(price, originalPrice);
   const inStock = stock > 0;
@@ -191,6 +196,20 @@ const SingleProductPage = () => {
         <div className={styles.row}>
           <span>Envío Disponible:</span>
           <p>{isShippingAvailable ? 'Sí' : 'No'}</p>
+        </div>
+
+        <div className={styles.row}>
+          <span>Métodos de Pago:</span>
+          <div className={styles.paymentMethods}>
+            {(paymentType === 'cash' || paymentType === 'both') && (
+              <span className={styles.paymentCash}>💰 Efectivo: <Price amount={price} showCurrency={false} /></span>
+            )}
+            {(paymentType === 'transfer' || paymentType === 'both') && (
+              <span className={styles.paymentTransfer}>
+                💳 Transferencia: <Price amount={transferPrice} showCurrency={false} /> (+{transferFeePercentage || 5}%)
+              </span>
+            )}
+          </div>
         </div>
 
         <div className={styles.row}>

@@ -3,6 +3,7 @@ import Title from '../Title/Title';
 import styles from './Categories.module.css';
 import { useAllProductsContext } from '../../contexts/ProductsContextProvider';
 import { useFiltersContext } from '../../contexts/FiltersContextProvider';
+import { useEffect } from 'react';
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -19,12 +20,15 @@ const Categories = () => {
     navigate('/products');
   };
 
+  // FILTRAR CATEGORÍAS HABILITADAS SOLAMENTE
+  const enabledCategories = categoriesFromContext.filter(category => !category.disabled);
+
   return (
     <section className='section'>
       <Title>Categorías</Title>
 
       <div className={`container ${styles.categoryContainer}`}>
-        {categoriesFromContext.map(({ _id, categoryName, categoryImage }) => (
+        {enabledCategories.map(({ _id, categoryName, categoryImage }) => (
           <article
             key={_id}
             className={styles.category}

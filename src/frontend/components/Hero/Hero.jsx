@@ -1,6 +1,6 @@
 import styles from './Hero.module.css';
 
-import jethalalBanner from '../../assets/jethalalBanner.png';
+import jethalalBanner from '../../assets/lovepik.png';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '../../hooks';
 
@@ -11,12 +11,10 @@ const Hero = () => {
     <section className='white-bcg'>
       <div className={`container ${styles.hero}`}>
         <article className={styles.content}>
-          <h1>Experimenta la Electrónica Redefinida: Libera la Innovación</h1>
+          <h1>La plataforma de comercio detrás de todo</h1>
 
           <p>
-            Descubre el Futuro de la Electrónica: Libera la Innovación, Sumérgete en 
-            Calidad Sin Igual. Experimenta nuestra tecnología de vanguardia y 
-            eleva tu día a día con Gada Electronics. Explora lo extraordinario hoy.
+            ¡Bienvenido a <span className="yero-shop-text-hero">Yero Shop!</span> Vende online y en persona. Vende a nivel local y mundial.
           </p>
 
           <Link to='/products' className={`btn ${styles.btnHero}`}>
@@ -28,7 +26,7 @@ const Hero = () => {
           <article className={styles.imageContainer}>
             <img
               src={jethalalBanner}
-              alt='jethalal'
+              alt="jethalal"
               className={styles.banner}
             />
           </article>

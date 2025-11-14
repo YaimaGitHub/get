@@ -28,6 +28,13 @@ const CartProductCard = ({ singleCartItem }) => {
   const { _id, name, price, originalPrice, image, qty, colors } =
     singleCartItem;
 
+  // Obtener información de pago
+  const paymentType = singleCartItem.paymentType || 'both';
+  const transferFeePercentage = singleCartItem.transferFeePercentage || 5;
+  
+  // Calcular precio con transferencia para mostrar información completa
+  const transferPrice = price * (1 + transferFeePercentage / 100);
+
   const { color, colorQuantity } = colors[0];
 
   const discountPercent = calculateDiscountPercent(price, originalPrice);
@@ -84,6 +91,22 @@ const CartProductCard = ({ singleCartItem }) => {
                   ({discountPercent}% desc.)
                 </span>
               </>
+            )}
+          </div>
+
+          <div className={styles.paymentInfo}>
+            {paymentType === 'cash' && (
+              <span className={styles.paymentCash}>💰 Solo Efectivo</span>
+            )}
+            {paymentType === 'transfer' && (
+              <span className={styles.paymentTransfer}>
+                💳 Solo Transferencia (+{transferFeePercentage}% = <Price amount={transferPrice} showCurrency={false} />)
+              </span>
+            )}
+            {paymentType === 'both' && (
+              <span className={styles.paymentBoth}>
+                💰💳 Efectivo: <Price amount={price} showCurrency={false} /> | Transferencia: <Price amount={transferPrice} showCurrency={false} /> (+{transferFeePercentage}%)
+              </span>
             )}
           </div>
 

@@ -14,22 +14,16 @@
 }
 
 .disabledProduct::before {
-  content: 'Agotado';
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--overlay-bcg);
+  background: url('https://f005.backblazeb2.com/file/120000/Yero+Shop/agotado.png') center/cover, var(--overlay-bcg);
   z-index: 2;
   cursor: not-allowed;
-  color: var(--white);
-  letter-spacing: var(--letterSpacing);
-  font-size: 1.25rem;
-  display: grid;
-  place-items: center;
   border-radius: var(--borderRadius);
-  font-weight: 600;
 }
 
 .imgContainer {
@@ -126,6 +120,45 @@
 
 .discount {
   color: var(--green-medium);
+}
+
+.paymentInfo {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.paymentCash {
+  background: var(--green-light);
+  color: var(--green-dark);
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--green-medium);
+}
+
+.paymentTransfer {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #f59e0b;
+}
+
+.paymentBoth {
+  background: linear-gradient(135deg, var(--green-light), #fef3c7);
+  color: var(--grey-800);
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--primary-300);
+  line-height: 1.4;
+  text-align: center;
+  max-width: 200px;
 }
 
 .colorsContainer,
@@ -254,6 +287,15 @@
 
   .disabledProduct::before {
     font-size: 1.5rem;
+  }
+
+  .paymentCash,
+  .paymentTransfer,
+  .paymentBoth {
+    font-size: 0.85rem;
+    padding: 0.35rem 1rem;
+    line-height: 1.5;
+    max-width: 250px;
   }
 
   /* skeleton card css */
