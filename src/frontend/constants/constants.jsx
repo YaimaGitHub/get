@@ -332,7 +332,7 @@ export const CURRENCIES = {
     name: 'Moneda Libremente Convertible',
     symbol: 'MLC',
     flag: '🏦',
-    rate: 270,
+    rate: 285,
   },
 };
 
